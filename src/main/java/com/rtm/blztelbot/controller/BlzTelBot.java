@@ -10,9 +10,9 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @Component
 public class BlzTelBot extends TelegramLongPollingBot {
 
-    public BlzTelBot(DefaultBotOptions botOptions) {
-        super(botOptions);
-    }
+//    public BlzTelBot(DefaultBotOptions botOptions) {
+//        super(botOptions);
+//    }
 
     @Override
     public void onUpdateReceived(Update update) {
