@@ -15,7 +15,7 @@ public class BlztelbotApplication {
         SpringApplication.run(BlztelbotApplication.class, args);
     }
 
-    @Bean
+//    @Bean
     public DefaultBotOptions getDefBotOptions() {
         DefaultBotOptions botOptions = ApiContext.getInstance(DefaultBotOptions.class);
         botOptions.setProxyHost("127.0.0.1");
