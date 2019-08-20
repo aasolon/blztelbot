@@ -1,4 +1,4 @@
-package com.rtm.blztelbot.controller;
+package com.rtm.blztelbot.bot;
 
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
@@ -10,9 +10,19 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @Component
 public class BlzTelBot extends TelegramLongPollingBot {
 
-//    public BlzTelBot(DefaultBotOptions botOptions) {
-//        super(botOptions);
-//    }
+    public BlzTelBot(DefaultBotOptions botOptions) {
+        super(botOptions);
+    }
+
+    @Override
+    public String getBotUsername() {
+        return System.getenv("BOT_USERNAME");
+    }
+
+    @Override
+    public String getBotToken() {
+        return System.getenv("BOT_TOKEN");
+    }
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -28,13 +38,14 @@ public class BlzTelBot extends TelegramLongPollingBot {
         }
     }
 
-    @Override
-    public String getBotUsername() {
-        return System.getenv("BOT_USERNAME");
-    }
-
-    @Override
-    public String getBotToken() {
-        return System.getenv("BOT_TOKEN");
+    public void sendMessage(String text) {
+        SendMessage message = new SendMessage()
+                .setChatId(128316795L)
+                .setText(text);
+        try {
+            execute(message); // Call method to send the message
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
     }
 }
