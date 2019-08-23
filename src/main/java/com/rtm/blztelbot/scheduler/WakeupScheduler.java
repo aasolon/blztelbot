@@ -12,7 +12,7 @@ public class WakeupScheduler {
     @Autowired
     private RestTemplate restTemplate;
 
-    @Scheduled(cron = "0 0/5 10,11,12,13,14,15,16,17,18,19,20,21,22,23,0,1,2 * * ?")
+    @Scheduled(cron = "0 0/5 * * * ?")
     public void wakeUp() {
         ResponseEntity<String> result = restTemplate.getForEntity("https://blztelbot.herokuapp.com/wakeup", String.class);
     }
