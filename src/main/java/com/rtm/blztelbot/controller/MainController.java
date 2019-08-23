@@ -1,7 +1,7 @@
 package com.rtm.blztelbot.controller;
 
 import com.rtm.blztelbot.bot.BlzTelBot;
-import com.rtm.blztelbot.oauth2.OAuth2FlowHandler;
+import com.rtm.blztelbot.api.oauth2.OAuth2FlowHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;

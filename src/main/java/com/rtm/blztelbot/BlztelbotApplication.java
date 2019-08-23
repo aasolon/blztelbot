@@ -2,6 +2,7 @@ package com.rtm.blztelbot;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -15,6 +16,7 @@ import org.telegram.telegrambots.meta.ApiContext;
  */
 @SpringBootApplication
 @EnableScheduling
+@EnableConfigurationProperties(AppConfig.class)
 public class BlztelbotApplication {
 
     public static void main(String[] args) {

@@ -1,6 +1,7 @@
-package com.rtm.blztelbot.oauth2;
+package com.rtm.blztelbot.api.oauth2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rtm.blztelbot.AppConfig;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,9 @@ import java.util.Base64;
  */
 @Service
 public class OAuth2FlowHandler {
+
+    @Autowired
+    private AppConfig appConfig;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -48,14 +52,13 @@ public class OAuth2FlowHandler {
             HttpURLConnection con = null;
 
             try{
-                URL url = new URL(new URL("https://eu.battle.net/oauth/token"), "", urlStreamHandler);
+                URL url = new URL(appConfig.getTokenUrl(), "", urlStreamHandler);
                 con = (HttpURLConnection) url.openConnection();
                 con.setRequestMethod("POST");
                 con.setRequestProperty("Authorization", String.format("Basic %s", encodedCredentials));
                 con.setDoOutput(true);
                 con.getOutputStream().write("grant_type=client_credentials".getBytes(StandardCharsets.UTF_8));
 
-                int responseCode = con.getResponseCode();
                 String response = IOUtils.toString(con.getInputStream(), StandardCharsets.UTF_8);
 
                 // Reads the JSON response and converts it to TokenResponse class or throws an exception

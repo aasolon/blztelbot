@@ -1,0 +1,3 @@
+main:
+  base-url: https://eu.api.blizzard.com
+  token-url: https://eu.battle.net/oauth/token

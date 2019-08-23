@@ -1,4 +1,4 @@
-package com.rtm.blztelbot.oauth2;
+package com.rtm.blztelbot.api.oauth2;
 
 public class TokenResponse {
     /**
