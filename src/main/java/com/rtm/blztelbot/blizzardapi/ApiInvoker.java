@@ -1,7 +1,7 @@
-package com.rtm.blztelbot.api;
+package com.rtm.blztelbot.blizzardapi;
 
 import com.rtm.blztelbot.AppConfig;
-import com.rtm.blztelbot.api.oauth2.OAuth2FlowHandler;
+import com.rtm.blztelbot.blizzardapi.oauth2.OAuth2FlowHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;

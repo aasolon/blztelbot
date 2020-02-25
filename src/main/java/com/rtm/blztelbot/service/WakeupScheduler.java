@@ -1,4 +1,4 @@
-package com.rtm.blztelbot.scheduler;
+package com.rtm.blztelbot.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

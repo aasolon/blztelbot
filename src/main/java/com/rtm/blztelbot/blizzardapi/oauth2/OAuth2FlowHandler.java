@@ -1,4 +1,4 @@
-package com.rtm.blztelbot.api.oauth2;
+package com.rtm.blztelbot.blizzardapi.oauth2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rtm.blztelbot.AppConfig;

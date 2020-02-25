@@ -1,7 +1,7 @@
 package com.rtm.blztelbot.controller;
 
-import com.rtm.blztelbot.api.oauth2.OAuth2FlowHandler;
-import com.rtm.blztelbot.bot.BlzTelBot;
+import com.rtm.blztelbot.blizzardapi.oauth2.OAuth2FlowHandler;
+import com.rtm.blztelbot.telegrambot.BlzTelBot;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +21,7 @@ public class MainController {
 
     @RequestMapping("/wakeup")
     public void wakeUp() {
-        blzTelBot.sendMessage("wakeup");
+        blzTelBot.sendMessageToMe("wakeup1");
     }
 
     @RequestMapping("/test")
@@ -41,9 +41,9 @@ public class MainController {
             String stepNumber = params.get("value3");
             String msg = "Эй, " + playerName + ", ходи уже (ход " + stepNumber + ")" +
                     (timePassed != null ? "\nПрошло времени с последнего хода: " + timePassed : "");
-            blzTelBot.sendMessage(msg);
+            blzTelBot.sendMessageToMe(msg);
         } catch (Exception e) {
-            blzTelBot.sendMessage(ExceptionUtils.getStackTrace(e));
+            blzTelBot.sendMessageToMe(ExceptionUtils.getStackTrace(e));
         }
     }
 

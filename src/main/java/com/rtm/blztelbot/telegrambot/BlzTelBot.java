@@ -1,7 +1,6 @@
-package com.rtm.blztelbot.bot;
+package com.rtm.blztelbot.telegrambot;
 
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -38,7 +37,7 @@ public class BlzTelBot extends TelegramLongPollingBot {
         }
     }
 
-    public void sendMessage(String text) {
+    public void sendMessageToMe(String text) {
         SendMessage message = new SendMessage()
                 .setChatId(128316795L)
                 .setText(text);
