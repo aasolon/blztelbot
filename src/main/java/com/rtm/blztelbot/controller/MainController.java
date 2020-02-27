@@ -1,6 +1,7 @@
 package com.rtm.blztelbot.controller;
 
 import com.rtm.blztelbot.blizzardapi.oauth2.OAuth2FlowHandler;
+import com.rtm.blztelbot.service.Civ6Service;
 import com.rtm.blztelbot.telegrambot.BlzTelBot;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +20,21 @@ public class MainController {
     @Autowired
     private OAuth2FlowHandler oAuth2FlowHandler;
 
+    @Autowired
+    private Civ6Service civ6Service;
+
     @RequestMapping("/wakeup")
     public void wakeUp() {
         blzTelBot.sendMessageToMe("wakeup1");
     }
 
-    @RequestMapping("/test")
-    public String test(@RequestParam String param) throws IOException {
+    @RequestMapping("/test-db")
+    public String testDB() {
+        return civ6Service.getInfo();
+    }
+
+    @RequestMapping("/test-oauth")
+    public String testOAuth(@RequestParam String param) throws IOException {
         oAuth2FlowHandler.getToken();
         return "received: " + param;
     }
