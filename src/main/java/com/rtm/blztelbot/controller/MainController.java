@@ -1,8 +1,9 @@
 package com.rtm.blztelbot.controller;
 
 import com.rtm.blztelbot.blizzardapi.oauth2.OAuth2FlowHandler;
+import com.rtm.blztelbot.model.Civ6Webhook;
+import com.rtm.blztelbot.service.BlzTelBotService;
 import com.rtm.blztelbot.service.Civ6Service;
-import com.rtm.blztelbot.telegrambot.BlzTelBot;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class MainController {
 
     @Autowired
-    private BlzTelBot blzTelBot;
+    private BlzTelBotService blzTelBotService;
 
     @Autowired
     private OAuth2FlowHandler oAuth2FlowHandler;
@@ -25,12 +26,7 @@ public class MainController {
 
     @RequestMapping("/wakeup")
     public void wakeUp() {
-        blzTelBot.sendMessageToMe("wakeup1");
-    }
-
-    @RequestMapping("/test-db")
-    public String testDB() {
-        return civ6Service.getInfo();
+        blzTelBotService.sendMessageToMe("wakeup1");
     }
 
     @RequestMapping("/test-oauth")
@@ -39,10 +35,15 @@ public class MainController {
         return "received: " + param;
     }
 
+    @RequestMapping(value = "/add-turn-info", method = RequestMethod.POST)
+    public void addTurnInfo(@RequestBody Civ6Webhook webhook) {
+        civ6Service.addTurnInfoRaw(webhook);
+    }
+
     private static long lastStepTime;
 
-    @RequestMapping(value = "/civ6", method = RequestMethod.POST)
-    public void test(@RequestBody Map<String, String> params) {
+    @RequestMapping(value = "/civ6-test", method = RequestMethod.POST)
+    public void civ6test(@RequestBody Map<String, String> params) {
         try {
             String timePassed = lastStepTime != 0 ? getTimePassed() : null;
             lastStepTime = System.currentTimeMillis();
@@ -50,9 +51,9 @@ public class MainController {
             String stepNumber = params.get("value3");
             String msg = "Эй, " + playerName + ", ходи уже (ход " + stepNumber + ")" +
                     (timePassed != null ? "\nПрошло времени с последнего хода: " + timePassed : "");
-            blzTelBot.sendMessageToMe(msg);
+            blzTelBotService.sendMessageToMe(msg);
         } catch (Exception e) {
-            blzTelBot.sendMessageToMe(ExceptionUtils.getStackTrace(e));
+            blzTelBotService.sendMessageToMe(ExceptionUtils.getStackTrace(e));
         }
     }
 

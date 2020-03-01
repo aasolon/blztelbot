@@ -1,8 +1,8 @@
 #spring:
 #  datasource:
-#    url: jdbc:postgresql://ec2-176-34-97-213.eu-west-1.compute.amazonaws.com:5432/d3800pbgdb7bu7
-#    username: kdmofmfswfykqp
-#    password: 8a0643a12d144520b552e652fae8819a8bbca1e57cf9343e027c8717254e2fd0
+#    url: ${JDBC_DATABASE_URL}
+#    username: ${JDBC_DATABASE_USERNAME}
+#    password: ${JDBC_DATABASE_PASSWORD}
 
 main:
   base-url: https://eu.api.blizzard.com

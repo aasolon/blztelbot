@@ -1,5 +1,7 @@
 package com.rtm.blztelbot.telegrambot;
 
+import com.rtm.blztelbot.service.BlzTelBotService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -10,22 +12,34 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @Component
 public class BlzTelBot extends TelegramLongPollingBot {
 
+    @Autowired
+    private BlzTelBotService blzTelBotService;
+
 //    public BlzTelBot(DefaultBotOptions botOptions) {
 //        super(botOptions);
 //    }
 
     @Override
     public String getBotUsername() {
-        return System.getenv("BOT_USERNAME");
+        return System.getenv("TELEGRAM_BOT_USERNAME");
     }
 
     @Override
     public String getBotToken() {
-        return System.getenv("BOT_TOKEN");
+        return System.getenv("TELEGRAM_BOT_TOKEN");
     }
 
     @Override
     public void onUpdateReceived(Update update) {
+        if (update.hasMessage()) {
+            long telegramAdminChatId = Long.parseLong(System.getenv("TELEGRAM_ADMIN_CHAT_ID"));
+            Long chatId = update.getMessage().getChatId();
+            if (chatId != null && chatId == telegramAdminChatId) {
+                blzTelBotService.processAdminMsg(update.getMessage());
+            } else {
+                blzTelBotService.processMsg(update.getMessage());
+            }
+        }
         if (update.hasMessage() && update.getMessage().hasText()) {
             SendMessage message = new SendMessage()
                     .setChatId(update.getMessage().getChatId())
@@ -38,9 +52,9 @@ public class BlzTelBot extends TelegramLongPollingBot {
         }
     }
 
-    public void sendMessageToMe(String text) {
+    public void sendMessage(long chatId, String text) {
         SendMessage message = new SendMessage()
-                .setChatId(128316795L)
+                .setChatId(chatId)
                 .setText(text);
         try {
             execute(message); // Call method to send the message
