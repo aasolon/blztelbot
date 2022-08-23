@@ -11,17 +11,14 @@ import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.meta.ApiContext;
 
-/**
- * https://blztelbot.herokuapp.com/
- */
 @SpringBootApplication
 @EnableScheduling
 @EnableConfigurationProperties(AppConfig.class)
-public class BlztelbotApplication {
+public class BlzTelBotApplication {
 
     public static void main(String[] args) {
         ApiContextInitializer.init();
-        SpringApplication.run(BlztelbotApplication.class, args);
+        SpringApplication.run(BlzTelBotApplication.class, args);
     }
 
 //    @Bean
@@ -35,7 +32,6 @@ public class BlztelbotApplication {
 
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
-        // Do any additional configuration here
         return builder.build();
     }
 }

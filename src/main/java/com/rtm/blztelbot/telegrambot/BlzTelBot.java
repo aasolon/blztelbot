@@ -1,9 +1,7 @@
 package com.rtm.blztelbot.telegrambot;
 
-import com.rtm.blztelbot.service.BlzTelBotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -12,8 +10,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @Component
 public class BlzTelBot extends TelegramLongPollingBot {
 
-    @Autowired
-    private BlzTelBotService blzTelBotService;
+//    @Autowired
+//    private BlzTelBotService blzTelBotService;
 
 //    public BlzTelBot(DefaultBotOptions botOptions) {
 //        super(botOptions);
@@ -35,9 +33,9 @@ public class BlzTelBot extends TelegramLongPollingBot {
             long telegramAdminChatId = Long.parseLong(System.getenv("TELEGRAM_ADMIN_CHAT_ID"));
             Long chatId = update.getMessage().getChatId();
             if (chatId != null && chatId == telegramAdminChatId) {
-                blzTelBotService.processAdminMsg(update.getMessage());
+//                blzTelBotService.processAdminMsg(update.getMessage());
             } else {
-                blzTelBotService.processMsg(update.getMessage());
+//                blzTelBotService.processMsg(update.getMessage());
             }
         }
         if (update.hasMessage() && update.getMessage().hasText()) {

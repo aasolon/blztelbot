@@ -1,9 +1,0 @@
-#spring:
-#  datasource:
-#    url: ${JDBC_DATABASE_URL}
-#    username: ${JDBC_DATABASE_USERNAME}
-#    password: ${JDBC_DATABASE_PASSWORD}
-
-main:
-  base-url: https://eu.api.blizzard.com
-  token-url: https://eu.battle.net/oauth/token
