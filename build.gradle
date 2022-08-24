@@ -28,3 +28,10 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+// по дефолту для Spring Boot приложения создаются два артефакта: запускаемый bootJar и plain jar;
+// именно plain jar почему-то пытается запуститься на Heroku, нужно убрать генерацию этого артефакта
+// https://docs.spring.io/spring-boot/docs/current/gradle-plugin/reference/htmlsingle/#packaging-executable.and-plain-archives
+jar {
+    enabled = false
+}
