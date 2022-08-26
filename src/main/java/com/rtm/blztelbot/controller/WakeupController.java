@@ -1,5 +1,6 @@
-package com.rtm.blztelbot.scheduler;
+package com.rtm.blztelbot.controller;
 
+import com.rtm.blztelbot.service.WakeupService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

@@ -1,4 +1,4 @@
-package com.rtm.blztelbot.scheduler;
+package com.rtm.blztelbot.service;
 
 import com.rtm.blztelbot.telegrambot.BlzTelBot;
 import org.springframework.stereotype.Service;

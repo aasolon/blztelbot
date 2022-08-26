@@ -18,9 +18,11 @@ dependencies {
     implementation 'com.h2database:h2:2.1.214'
     implementation 'org.postgresql:postgresql'
 
-    implementation 'org.telegram:telegrambots:4.4.0.1'
-    implementation 'org.telegram:telegrambots-spring-boot-starter:4.1.2'
-    implementation 'org.apache.commons:commons-lang3:3.9'
+    implementation 'org.telegram:telegrambots:6.1.0'
+    implementation 'org.telegram:telegrambots-spring-boot-starter:6.1.0'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+
+    implementation 'org.jsoup:jsoup:1.15.3'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

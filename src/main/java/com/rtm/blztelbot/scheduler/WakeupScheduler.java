@@ -1,6 +1,5 @@
 package com.rtm.blztelbot.scheduler;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -8,11 +7,14 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class WakeupScheduler {
 
-    @Autowired
-    private RestTemplate restTemplate;
+    private final RestTemplate herokuRestTemplate;
+
+    public WakeupScheduler(RestTemplate herokuRestTemplate) {
+        this.herokuRestTemplate = herokuRestTemplate;
+    }
 
     @Scheduled(cron = "0 0/5 * * * ?")
     public void wakeUp() {
-        restTemplate.getForEntity("https://blztelbot.herokuapp.com/wakeup", String.class);
+        herokuRestTemplate.getForEntity("https://blztelbot.herokuapp.com/wakeup", String.class);
     }
 }

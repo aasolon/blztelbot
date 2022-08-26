@@ -1,28 +1,29 @@
 package com.rtm.blztelbot;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 
-import java.net.URL;
-
-@ConfigurationProperties(prefix = "main")
+@Configuration
 public class AppConfig {
 
-    private URL baseUrl;
-    private URL tokenUrl;
+    //    @Bean
+//    public DefaultBotOptions getDefBotOptions() {
+//        DefaultBotOptions botOptions = ApiContext.getInstance(DefaultBotOptions.class);
+//        botOptions.setProxyHost("127.0.0.1");
+//        botOptions.setProxyPort(9150);
+//        botOptions.setProxyType(DefaultBotOptions.ProxyType.SOCKS5);
+//        return botOptions;
+//    }
 
-    public URL getBaseUrl() {
-        return baseUrl;
+    @Bean
+    public RestTemplate herokuRestTemplate(RestTemplateBuilder builder) {
+        return builder.build();
     }
 
-    public void setBaseUrl(URL baseUrl) {
-        this.baseUrl = baseUrl;
-    }
-
-    public URL getTokenUrl() {
-        return tokenUrl;
-    }
-
-    public void setTokenUrl(URL tokenUrl) {
-        this.tokenUrl = tokenUrl;
+    @Bean
+    public RestTemplate pikRestTemplate(RestTemplateBuilder builder) {
+        return builder.build();
     }
 }

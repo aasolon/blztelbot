@@ -28,6 +28,9 @@ public class BlzTelBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
+        // 5053544603 - t
+        // 128316795  - a
+        // 2147483647 - max
         if (update.hasMessage()) {
             long telegramAdminChatId = Long.parseLong(System.getenv("TELEGRAM_ADMIN_CHAT_ID"));
             Long chatId = update.getMessage().getChatId();
@@ -38,9 +41,9 @@ public class BlzTelBot extends TelegramLongPollingBot {
             }
         }
         if (update.hasMessage() && update.getMessage().hasText()) {
-            SendMessage message = new SendMessage()
-                    .setChatId(update.getMessage().getChatId())
-                    .setText("recieved " + update.getMessage().getText());
+            SendMessage message = new SendMessage();
+            message.setChatId(update.getMessage().getChatId());
+            message.setText("recieved " + update.getMessage().getText());
             try {
                 execute(message); // Call method to send the message
             } catch (TelegramApiException e) {
@@ -50,9 +53,9 @@ public class BlzTelBot extends TelegramLongPollingBot {
     }
 
     public void sendMessage(long chatId, String text) {
-        SendMessage message = new SendMessage()
-                .setChatId(chatId)
-                .setText(text);
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        message.setText(text);
         try {
             execute(message); // Call method to send the message
         } catch (TelegramApiException e) {
