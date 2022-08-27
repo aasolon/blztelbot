@@ -1,5 +1,6 @@
 package com.rtm.blztelbot.service;
 
+import com.google.common.base.Splitter;
 import com.rtm.blztelbot.telegrambot.BlzTelBot;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,9 @@ public class BlzTelBotService {
 
     public void sendMessageToMe(String text) {
         long chatId = Long.parseLong(System.getenv("TELEGRAM_ADMIN_CHAT_ID"));
-        blzTelBot.sendMessage(chatId, text);
+        for(final String token : Splitter.fixedLength(4000).split(text)) {
+            blzTelBot.sendMessage(chatId, token);
+        }
+
     }
 }

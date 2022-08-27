@@ -12,8 +12,8 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -57,7 +57,7 @@ public class FlatService {
         List<String> changes = new ArrayList<>();
 
         for (FlatEntity dbFlat : dbFlats) {
-            FlatStatusEntity dbFlatLastStatus = dbFlat.getFlatStatuses().stream().max(Comparator.comparing(FlatStatusEntity::getCreateDatetime)).get();
+            FlatStatusEntity dbFlatLastStatus = getFlatLastStatusEntity(dbFlat);
 
             boolean siteActive = true;
             Document flatPage = null;
@@ -83,6 +83,7 @@ public class FlatService {
                     changes.add("По квартире есть изменения: " + dbFlat.getUrl());
                 }
             }
+//            break;
         }
 
         List<Long> dbFlatIdsFromSite = dbFlats.stream().map(FlatEntity::getIdFromSite).collect(Collectors.toList());
@@ -106,9 +107,16 @@ public class FlatService {
                 log.error("Ошибка при обработке квартиры " + flatUrl);
                 throw ex;
             }
+//            break;
         }
 
         blzTelBotService.sendMessageToMe(StringUtils.join(changes, "\n"));
+    }
+
+    @Transactional(readOnly = true)
+    FlatStatusEntity getFlatLastStatusEntity(FlatEntity dbFlat) {
+        FlatStatusEntity dbFlatLastStatus = dbFlat.getFlatStatuses().stream().max(Comparator.comparing(FlatStatusEntity::getCreateDatetime)).get();
+        return dbFlatLastStatus;
     }
 
     @Transactional

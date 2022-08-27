@@ -12,6 +12,11 @@ public class WakeupService {
         this.blzTelBot = blzTelBot;
     }
 
+//    private BlzTelBot blzTelBot;
+//
+//    public WakeupService() {
+//    }
+
     public void sendWakeUpMessageToMe(String text) {
         long chatId = Long.parseLong(System.getenv("TELEGRAM_ADMIN_CHAT_ID"));
         blzTelBot.sendMessage(chatId, text);
