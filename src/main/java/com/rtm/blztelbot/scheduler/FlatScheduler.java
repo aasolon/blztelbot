@@ -2,10 +2,11 @@ package com.rtm.blztelbot.scheduler;
 
 import com.rtm.blztelbot.service.FlatService;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
-//@Service
+@Service
 public class FlatScheduler {
 
     private final FlatService flatService;
