@@ -3,7 +3,6 @@ package com.rtm.blztelbot.service;
 import com.rtm.blztelbot.entity.FlatEntity;
 import com.rtm.blztelbot.entity.FlatStatusEntity;
 import com.rtm.blztelbot.repository.FlatRepository;
-import com.rtm.blztelbot.repository.FlatStatusRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
@@ -17,8 +16,10 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,11 +29,11 @@ public class FlatService {
 
     private final FlatRepository flatRepository;
 
-    private final FlatStatusRepository flatStatusRepository;
+    private final BlzTelBotService blzTelBotService;
 
-    public FlatService(FlatRepository flatRepository, FlatStatusRepository flatStatusRepository) {
+    public FlatService(FlatRepository flatRepository, BlzTelBotService blzTelBotService) {
         this.flatRepository = flatRepository;
-        this.flatStatusRepository = flatStatusRepository;
+        this.blzTelBotService = blzTelBotService;
     }
 
     /**
@@ -52,26 +53,35 @@ public class FlatService {
      */
     public void refreshFlats() throws IOException {
         List<FlatEntity> dbFlats = flatRepository.findAll();
-        for (FlatEntity dbFlat : dbFlats) {
-            FlatStatusEntity dbFlatStatus = dbFlat.getFlatStatuses().stream().max(Comparator.comparing(FlatStatusEntity::getCreateDatetime)).get();
 
+        List<String> changes = new ArrayList<>();
+
+        for (FlatEntity dbFlat : dbFlats) {
+            FlatStatusEntity dbFlatLastStatus = dbFlat.getFlatStatuses().stream().max(Comparator.comparing(FlatStatusEntity::getCreateDatetime)).get();
+
+            boolean siteActive = true;
             Document flatPage = null;
             try {
                 flatPage = Jsoup.connect(dbFlat.getUrl()).get();
             } catch (HttpStatusException ex) {
-                int statusCode = ex.getStatusCode();
-                if (statusCode == 404) {
-                    if (dbFlatStatus.getActive()) {
-                        saveNewNotActiveFlatStatus(dbFlat);
-                    }
-                    continue;
+                if (ex.getStatusCode() == 404) {
+                    siteActive = false;
                 } else {
                     throw ex;
                 }
             }
 
-            if (!dbFlatStatus.getActive()) {
-
+            if (dbFlatLastStatus.getActive() && !siteActive) {
+                saveNewNotActiveFlatStatus(dbFlat);
+                changes.add("Квартира пропала с сайта: " + dbFlat.getUrl());
+            } else if (!dbFlatLastStatus.getActive() && siteActive) {
+                saveNewActiveFlatStatus(dbFlat, flatPage);
+                changes.add("Квартира появилась на сайте: " + dbFlat.getUrl());
+            } else if (dbFlatLastStatus.getActive() && siteActive) {
+                boolean hasChanges = saveNewActiveFlatStatusIfChanged(dbFlat, dbFlatLastStatus, flatPage);
+                if (hasChanges) {
+                    changes.add("По квартире есть изменения: " + dbFlat.getUrl());
+                }
             }
         }
 
@@ -89,37 +99,16 @@ public class FlatService {
                 flatUrl = "https://www.pik.ru" + flatRelativePath;
                 if (!dbFlatIdsFromSite.contains(flatIdFromSite)) {
                     saveNewFlat(flatUrl, flatIdFromSite);
+                    changes.add("Появилась новая квартира: " + flatUrl);
                     log.info("Квартира успешно обработана " + flatUrl);
                 }
-                break;
             } catch (Exception ex) {
                 log.error("Ошибка при обработке квартиры " + flatUrl);
                 throw ex;
             }
         }
-//
-//
-//        FlatEntity flat = flatRepository.findByIdFromSite(idFromSite);
-//        if (flat != null) {
-//            FlatStatusEntity flatStatus = flatStatusRepository.findByError(error);
-//            if (flatStatus == null) {
-//                flatStatus = new FlatStatusEntity();
-//                flatStatus.setFlat(flat);
-//                flatStatus.setError(error);
-//                flat.getFlatStatuses().add(flatStatus);
-//            } else {
-//                flatStatus.setError(UUID.randomUUID().toString());
-//            }
-//        } else {
-//            flat = new FlatEntity();
-//            flat.setIdFromSite(idFromSite);
-//            flat.setUrl("//" + idFromSite);
-//            FlatStatusEntity flatStatus = new FlatStatusEntity();
-//            flatStatus.setFlat(flat);
-//            flatStatus.setError(error);
-//            flat.getFlatStatuses().add(flatStatus);
-//        }
-//        flatRepository.save(flat);
+
+        blzTelBotService.sendMessageToMe(StringUtils.join(changes, "\n"));
     }
 
     @Transactional
@@ -132,8 +121,44 @@ public class FlatService {
     }
 
     @Transactional
-    void saveNewActiveFlatStatus() {
+    void saveNewActiveFlatStatus(FlatEntity dbFlat, Document flatPage) {
+        String priceStr = flatPage.select("div[class^=styles__Price-sc]").text();
+        long price = Long.parseLong(priceStr.replaceAll("\\D+", ""));
+        Elements reserveButton = flatPage.select("div[class^=styles__SubscribeBookingButtonText]");
+        boolean reserve = reserveButton.size() > 0;
 
+        FlatStatusEntity newFlatStatusEntity = new FlatStatusEntity();
+        newFlatStatusEntity.setFlat(dbFlat);
+        dbFlat.getFlatStatuses().add(newFlatStatusEntity);
+
+        newFlatStatusEntity.setActive(true);
+        newFlatStatusEntity.setPrice(price);
+        newFlatStatusEntity.setReserve(reserve);
+
+        flatRepository.save(dbFlat);
+    }
+
+    @Transactional
+    boolean saveNewActiveFlatStatusIfChanged(FlatEntity dbFlat, FlatStatusEntity dbFlatLastStatus, Document flatPage) {
+        String priceStr = flatPage.select("div[class^=styles__Price-sc]").text();
+        long price = Long.parseLong(priceStr.replaceAll("\\D+", ""));
+        Elements reserveButton = flatPage.select("div[class^=styles__SubscribeBookingButtonText]");
+        boolean reserve = reserveButton.size() > 0;
+
+        if (!Objects.equals(dbFlatLastStatus.getPrice(), price) || !Objects.equals(dbFlatLastStatus.getReserve(), reserve)) {
+            FlatStatusEntity newFlatStatusEntity = new FlatStatusEntity();
+            newFlatStatusEntity.setFlat(dbFlat);
+            dbFlat.getFlatStatuses().add(newFlatStatusEntity);
+
+            newFlatStatusEntity.setActive(true);
+            newFlatStatusEntity.setPrice(price);
+            newFlatStatusEntity.setReserve(reserve);
+
+            flatRepository.save(dbFlat);
+            return true;
+        }
+
+        return false;
     }
 
     @Transactional
@@ -149,13 +174,12 @@ public class FlatService {
             int statusCode = ex.getStatusCode();
             if (statusCode == 404) {
                 active = false;
-
-                flatEntity.setIdFromSite(flatIdFromSite);
-                flatEntity.setUrl(flatUrl);
             } else {
                 throw ex;
             }
         }
+
+        flatStatusEntity.setActive(active);
 
         if (active) {
             String priceStr = flatPage.select("div[class^=styles__Price-sc]").text();
@@ -215,9 +239,10 @@ public class FlatService {
                     }
                 }
             }
+        } else {
+            flatEntity.setIdFromSite(flatIdFromSite);
+            flatEntity.setUrl(flatUrl);
         }
-
-        flatStatusEntity.setActive(active);
 
         flatRepository.save(flatEntity);
     }
