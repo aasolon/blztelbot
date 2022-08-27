@@ -57,33 +57,40 @@ public class FlatService {
         List<String> changes = new ArrayList<>();
 
         for (FlatEntity dbFlat : dbFlats) {
-            FlatStatusEntity dbFlatLastStatus = getFlatLastStatusEntity(dbFlat);
-
-            boolean siteActive = true;
-            Document flatPage = null;
             try {
-                flatPage = Jsoup.connect(dbFlat.getUrl()).get();
-            } catch (HttpStatusException ex) {
-                if (ex.getStatusCode() == 404) {
-                    siteActive = false;
-                } else {
-                    throw ex;
-                }
-            }
+                FlatStatusEntity dbFlatLastStatus = getFlatLastStatusEntity(dbFlat);
 
-            if (dbFlatLastStatus.getActive() && !siteActive) {
-                saveNewNotActiveFlatStatus(dbFlat);
-                changes.add("Квартира пропала с сайта: " + dbFlat.getUrl());
-            } else if (!dbFlatLastStatus.getActive() && siteActive) {
-                saveNewActiveFlatStatus(dbFlat, flatPage);
-                changes.add("Квартира появилась на сайте: " + dbFlat.getUrl());
-            } else if (dbFlatLastStatus.getActive() && siteActive) {
-                boolean hasChanges = saveNewActiveFlatStatusIfChanged(dbFlat, dbFlatLastStatus, flatPage);
-                if (hasChanges) {
-                    changes.add("По квартире есть изменения: " + dbFlat.getUrl());
+                boolean siteActive = true;
+                Document flatPage = null;
+                try {
+                    flatPage = Jsoup.connect(dbFlat.getUrl()).get();
+                } catch (HttpStatusException ex) {
+                    if (ex.getStatusCode() == 404) {
+                        siteActive = false;
+                    } else {
+                        throw ex;
+                    }
                 }
-            }
+
+                if (dbFlatLastStatus.getActive() && !siteActive) {
+                    saveNewNotActiveFlatStatus(dbFlat);
+                    changes.add("Квартира пропала с сайта: " + dbFlat.getUrl());
+                } else if (!dbFlatLastStatus.getActive() && siteActive) {
+                    saveNewActiveFlatStatus(dbFlat, flatPage);
+                    changes.add("Квартира появилась на сайте: " + dbFlat.getUrl());
+                } else if (dbFlatLastStatus.getActive() && siteActive) {
+                    boolean hasChanges = saveNewActiveFlatStatusIfChanged(dbFlat, dbFlatLastStatus, flatPage);
+                    if (hasChanges) {
+                        changes.add("По квартире есть изменения: " + dbFlat.getUrl());
+                    }
+                }
+
+                log.info("Существующая квартира успешно обработана из БД " + dbFlat.getUrl());
 //            break;
+            } catch (Exception ex) {
+                log.error("Ошибка при обработке существующей квартиры из БД " + dbFlat.getUrl());
+                throw ex;
+            }
         }
 
         List<Long> dbFlatIdsFromSite = dbFlats.stream().map(FlatEntity::getIdFromSite).collect(Collectors.toList());
@@ -101,10 +108,10 @@ public class FlatService {
                 if (!dbFlatIdsFromSite.contains(flatIdFromSite)) {
                     saveNewFlat(flatUrl, flatIdFromSite);
                     changes.add("Появилась новая квартира: " + flatUrl);
-                    log.info("Квартира успешно обработана " + flatUrl);
+                    log.info("Новая квартира успешно считана с сайта " + flatUrl);
                 }
             } catch (Exception ex) {
-                log.error("Ошибка при обработке квартиры " + flatUrl);
+                log.error("Ошибка при считывании новой квартиры с сайта " + flatUrl);
                 throw ex;
             }
 //            break;
