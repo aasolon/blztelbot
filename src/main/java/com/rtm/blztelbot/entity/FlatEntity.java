@@ -58,7 +58,7 @@ public class FlatEntity {
     @Column(name = "FLAT_TYPE", length = 255)
     private String flatType;
 
-    @OneToMany(mappedBy = "flat", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "flat", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<FlatStatusEntity> flatStatuses = new HashSet<>();
 
     public UUID getId() {

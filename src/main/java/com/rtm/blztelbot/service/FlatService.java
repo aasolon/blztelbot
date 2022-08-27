@@ -51,7 +51,7 @@ public class FlatService {
      * 5) Для каждой квартиры, которые остались в списке, пропарсить данные с урла и создать новые записи для них в БД,
      *    сохранить в список changed
      */
-    @Transactional
+//    @Transactional
     public void refreshFlats() throws IOException {
         List<FlatEntity> dbFlats = flatRepository.findAll();
 
@@ -59,7 +59,7 @@ public class FlatService {
 
         for (FlatEntity dbFlat : dbFlats) {
             try {
-                FlatStatusEntity dbFlatLastStatus = getFlatLastStatusEntity(dbFlat);
+                FlatStatusEntity dbFlatLastStatus = dbFlat.getFlatStatuses().stream().max(Comparator.comparing(FlatStatusEntity::getCreateDatetime)).get();
 
                 boolean siteActive = true;
                 Document flatPage = null;
@@ -121,13 +121,7 @@ public class FlatService {
         blzTelBotService.sendMessageToMe(StringUtils.join(changes, "\n"));
     }
 
-//    @Transactional(readOnly = true)
-    FlatStatusEntity getFlatLastStatusEntity(FlatEntity dbFlat) {
-        FlatStatusEntity dbFlatLastStatus = dbFlat.getFlatStatuses().stream().max(Comparator.comparing(FlatStatusEntity::getCreateDatetime)).get();
-        return dbFlatLastStatus;
-    }
-
-//    @Transactional
+    @Transactional
     void saveNewNotActiveFlatStatus(FlatEntity dbFlat) {
         FlatStatusEntity newFlatStatusEntity = new FlatStatusEntity();
         newFlatStatusEntity.setFlat(dbFlat);
@@ -136,7 +130,7 @@ public class FlatService {
         flatRepository.save(dbFlat);
     }
 
-//    @Transactional
+    @Transactional
     void saveNewActiveFlatStatus(FlatEntity dbFlat, Document flatPage) {
         String priceStr = flatPage.select("div[class^=styles__Price-sc]").text();
         long price = Long.parseLong(priceStr.replaceAll("\\D+", ""));
@@ -154,7 +148,7 @@ public class FlatService {
         flatRepository.save(dbFlat);
     }
 
-//    @Transactional
+    @Transactional
     boolean saveNewActiveFlatStatusIfChanged(FlatEntity dbFlat, FlatStatusEntity dbFlatLastStatus, Document flatPage) {
         String priceStr = flatPage.select("div[class^=styles__Price-sc]").text();
         long price = Long.parseLong(priceStr.replaceAll("\\D+", ""));
@@ -177,7 +171,7 @@ public class FlatService {
         return false;
     }
 
-//    @Transactional
+    @Transactional
     void saveNewFlat(String flatUrl, long flatIdFromSite) throws IOException {
         FlatEntity flatEntity = new FlatEntity();
         FlatStatusEntity flatStatusEntity = new FlatStatusEntity();
