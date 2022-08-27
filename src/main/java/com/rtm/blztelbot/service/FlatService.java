@@ -77,7 +77,7 @@ public class FlatService {
                     changes.add("Квартира пропала с сайта: " + dbFlat.getUrl());
                 } else if (!dbFlatLastStatus.getActive() && siteActive) {
                     saveNewActiveFlatStatus(dbFlat, flatPage);
-                    changes.add("Квартира появилась на сайте: " + dbFlat.getUrl());
+                    changes.add("Квартира снова появилась на сайте: " + dbFlat.getUrl());
                 } else if (dbFlatLastStatus.getActive() && siteActive) {
                     boolean hasChanges = saveNewActiveFlatStatusIfChanged(dbFlat, dbFlatLastStatus, flatPage);
                     if (hasChanges) {
