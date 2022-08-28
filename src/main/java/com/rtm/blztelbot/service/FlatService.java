@@ -145,8 +145,8 @@ public class FlatService {
         change += "\nЭтаж: " + dbFlat.getFloor() + " из " + dbFlat.getFloorMax();
         change += "\nКол-во комнат: " + (dbFlat.getRoomsNumber() == 0 ? "Студия" : dbFlat.getRoomsNumber());
         change += "\nПлощадь: " + dbFlat.getArea();
-        change += "\nЦена " + dbFlatLastStatus.getPrice();
-        change += "\nСтатус бронирования " + getReserveString(dbFlatLastStatus.getReserve());
+        change += "\nЦена: " + dbFlatLastStatus.getPrice();
+        change += "\nСтатус бронирования: " + getReserveString(dbFlatLastStatus.getReserve());
         changes.add(change);
     }
 
