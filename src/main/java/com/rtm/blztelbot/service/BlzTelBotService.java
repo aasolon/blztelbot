@@ -32,6 +32,13 @@ public class BlzTelBotService {
                 blzTelBot.sendMessage(chatId, token);
             }
         }
+    }
 
+    public void sendMessageToChatId(long chatId, String text) {
+        for(final String token : Splitter.fixedLength(4000).split(text)) {
+            if (StringUtils.isNotEmpty(token)) {
+                blzTelBot.sendMessage(chatId, token);
+            }
+        }
     }
 }

@@ -113,14 +113,20 @@ public class FlatService {
 //            break;
         }
 
-        if (changes.size() > 0 && changes.size() < 4) {
+        if (!changes.isEmpty()) {
             for (String change : changes) {
                 blzTelBotService.sendMessageToMe(change);
             }
-        } else {
-            blzTelBotService.sendMessageToMe("Произошло больше трех изменений по квартирам за последние 5 минут, " +
-                    "поэтому конкретные изменения по квартирам не отправлены в сообщении Телеграм, вместо этого смотрите " +
-                    "все изменения по адресу https://www.pik.ru/search/s16/chessplan?bulk_id=9119&currentBenefit=gospodderzhka");
+
+            if (changes.size() < 4) {
+                for (String change : changes) {
+                    blzTelBotService.sendMessageToChatId(5053544603L, change);
+                }
+            } else {
+                blzTelBotService.sendMessageToChatId(5053544603L, "Произошло больше трех изменений по квартирам за последние 5 минут, " +
+                        "поэтому конкретные изменения по квартирам не отправлены в сообщении Телеграм, вместо этого смотрите " +
+                        "все изменения по адресу https://www.pik.ru/search/s16/chessplan?bulk_id=9119&currentBenefit=gospodderzhka");
+            }
         }
     }
 
