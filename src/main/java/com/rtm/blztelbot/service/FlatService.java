@@ -74,16 +74,11 @@ public class FlatService {
                 }
 
                 if (dbFlatLastStatus.getActive() && !siteActive) {
-                    saveNewNotActiveFlatStatus(dbFlat);
-                    changes.add("Квартира пропала с сайта: " + dbFlat.getUrl());
+                    saveNewNotActiveFlatStatus(dbFlat, dbFlatLastStatus, changes);
                 } else if (!dbFlatLastStatus.getActive() && siteActive) {
-                    saveNewActiveFlatStatus(dbFlat, flatPage);
-                    changes.add("Квартира снова появилась на сайте: " + dbFlat.getUrl());
+                    saveNewActiveFlatStatus(dbFlat, dbFlatLastStatus, flatPage, changes);
                 } else if (dbFlatLastStatus.getActive() && siteActive) {
-                    boolean hasChanges = saveNewActiveFlatStatusIfChanged(dbFlat, dbFlatLastStatus, flatPage);
-                    if (hasChanges) {
-                        changes.add("По квартире есть изменения: " + dbFlat.getUrl());
-                    }
+                    saveNewActiveFlatStatusIfChanged(dbFlat, dbFlatLastStatus, flatPage, changes);
                 }
 
                 log.info("Существующая квартира успешно обработана из БД " + dbFlat.getUrl());
@@ -118,20 +113,39 @@ public class FlatService {
 //            break;
         }
 
-        blzTelBotService.sendMessageToMe(StringUtils.join(changes, "\n"));
+        if (changes.size() > 0 && changes.size() < 4) {
+            for (String change : changes) {
+                blzTelBotService.sendMessageToMe(change);
+            }
+        } else {
+            blzTelBotService.sendMessageToMe("Произошло больше трех изменений по квартирам за последние 5 минут, " +
+                    "поэтому конкретные изменения по квартирам не отправлены в сообщении Телеграм, вместо этого смотрите " +
+                    "все изменения по адресу https://www.pik.ru/search/s16/chessplan?bulk_id=9119&currentBenefit=gospodderzhka");
+        }
     }
 
     @Transactional
-    void saveNewNotActiveFlatStatus(FlatEntity dbFlat) {
+    void saveNewNotActiveFlatStatus(FlatEntity dbFlat, FlatStatusEntity dbFlatLastStatus, List<String> changes) {
         FlatStatusEntity newFlatStatusEntity = new FlatStatusEntity();
         newFlatStatusEntity.setFlat(dbFlat);
         newFlatStatusEntity.setActive(false);
+        newFlatStatusEntity.setPrice(dbFlatLastStatus.getPrice());
+        newFlatStatusEntity.setReserve(dbFlatLastStatus.getReserve());
         dbFlat.getFlatStatuses().add(newFlatStatusEntity);
         flatRepository.save(dbFlat);
+        String change = "Квартира пропала с сайта: " + dbFlat.getUrl();
+        change += "\nДанные по квартире";
+        change += "\nКорпус: " + dbFlat.getCorpus();
+        change += "\nЭтаж: " + dbFlat.getFloor() + " из " + dbFlat.getFloorMax();
+        change += "\nКол-во комнат: " + (dbFlat.getRoomsNumber() == 0 ? "Студия" : dbFlat.getRoomsNumber());
+        change += "\nПлощадь: " + dbFlat.getArea();
+        change += "\nЦена " + dbFlatLastStatus.getPrice();
+        change += "\nСтатус бронирования " + getReserveString(dbFlatLastStatus.getReserve());
+        changes.add(change);
     }
 
     @Transactional
-    void saveNewActiveFlatStatus(FlatEntity dbFlat, Document flatPage) {
+    void saveNewActiveFlatStatus(FlatEntity dbFlat, FlatStatusEntity dbFlatLastStatus, Document flatPage, List<String> changes) {
         String priceStr = flatPage.select("div[class^=styles__Price-sc]").text();
         long price = Long.parseLong(priceStr.replaceAll("\\D+", ""));
         Elements reserveButton = flatPage.select("div[class^=styles__SubscribeBookingButtonText]");
@@ -146,10 +160,18 @@ public class FlatService {
         newFlatStatusEntity.setReserve(reserve);
 
         flatRepository.save(dbFlat);
+        String change = "Квартира снова появилась на сайте: " + dbFlat.getUrl();
+        if (!Objects.equals(dbFlatLastStatus.getPrice(), price)) {
+            change += "\nСтарая цена: " + dbFlatLastStatus.getPrice() + ", новая цена: " + price;
+        }
+        if (!Objects.equals(dbFlatLastStatus.getReserve(), reserve)) {
+            change += "\nСтарый статус бронирования: " + getReserveString(dbFlatLastStatus.getReserve()) + ", новый статус бронирования: " + getReserveString(reserve);
+        }
+        changes.add(change);
     }
 
     @Transactional
-    boolean saveNewActiveFlatStatusIfChanged(FlatEntity dbFlat, FlatStatusEntity dbFlatLastStatus, Document flatPage) {
+    void saveNewActiveFlatStatusIfChanged(FlatEntity dbFlat, FlatStatusEntity dbFlatLastStatus, Document flatPage, List<String> changes) {
         String priceStr = flatPage.select("div[class^=styles__Price-sc]").text();
         long price = Long.parseLong(priceStr.replaceAll("\\D+", ""));
         Elements reserveButton = flatPage.select("div[class^=styles__SubscribeBookingButtonText]");
@@ -165,10 +187,16 @@ public class FlatService {
             newFlatStatusEntity.setReserve(reserve);
 
             flatRepository.save(dbFlat);
-            return true;
-        }
 
-        return false;
+            String change = "По квартире есть изменения: " + dbFlat.getUrl();
+            if (!Objects.equals(dbFlatLastStatus.getPrice(), price)) {
+                change += "\nСтарая цена: " + dbFlatLastStatus.getPrice() + ", новая цена: " + price;
+            }
+            if (!Objects.equals(dbFlatLastStatus.getReserve(), reserve)) {
+                change += "\nСтарый статус бронирования: " + getReserveString(dbFlatLastStatus.getReserve()) + ", новый статус бронирования: " + getReserveString(reserve);
+            }
+            changes.add(change);
+        }
     }
 
     @Transactional
@@ -195,7 +223,8 @@ public class FlatService {
             String priceStr = flatPage.select("div[class^=styles__Price-sc]").text();
             long price = Long.parseLong(priceStr.replaceAll("\\D+", ""));
             String title = flatPage.select("h1[class*=styles__Title-sc]").text();
-            BigDecimal area = new BigDecimal(title.replaceAll("[^0-9.]", ""));
+            String titleWithoutFirstWord = title.substring(title.indexOf(' ') + 1);
+            BigDecimal area = new BigDecimal(titleWithoutFirstWord.replaceAll("[^0-9.]", ""));
             String roomsNumberStr = title.split(" ", 2)[0];
             long roomsNumber;
             if ("Студия".equals(roomsNumberStr)) {
@@ -255,5 +284,9 @@ public class FlatService {
         }
 
         flatRepository.save(flatEntity);
+    }
+
+    private String getReserveString(boolean reserve) {
+        return reserve ? "Забронирована" : "Свободна, без брони";
     }
 }
