@@ -57,16 +57,16 @@ public class BlzTelBot extends TelegramLongPollingBot {
 //                blzTelBotService.processMsg(update.getMessage());
             }
         }
-        if (update.hasMessage() && update.getMessage().hasText()) {
-            SendMessage message = new SendMessage();
-            message.setChatId(update.getMessage().getChatId());
-            message.setText("recieved " + update.getMessage().getText() + " from @" + update.getMessage().getFrom().getUserName());
-            try {
-                execute(message); // Call method to send the message
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
-            }
-        }
+//        if (update.hasMessage() && update.getMessage().hasText()) {
+//            SendMessage message = new SendMessage();
+//            message.setChatId(update.getMessage().getChatId());
+//            message.setText("recieved " + update.getMessage().getText() + " from @" + update.getMessage().getFrom().getUserName());
+//            try {
+//                execute(message); // Call method to send the message
+//            } catch (TelegramApiException e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
     public void sendMessage(long chatId, String text) {
