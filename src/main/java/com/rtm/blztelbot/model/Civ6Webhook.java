@@ -1,48 +1,43 @@
 package com.rtm.blztelbot.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class Civ6Webhook {
 
     /**
      * Game Name
      */
-    private String Value1;
+    private String value1;
 
     /**
      * Player Name
      */
-    private String Value2;
+    private String value2;
 
     /**
      * Turn Number
      */
-    private String Value3;
+    private String value3;
 
-    @JsonProperty("Value1")
     public String getValue1() {
-        return Value1;
+        return value1;
     }
 
     public void setValue1(String value1) {
-        Value1 = value1;
+        value1 = value1;
     }
 
-    @JsonProperty("Value2")
     public String getValue2() {
-        return Value2;
+        return value2;
     }
 
     public void setValue2(String value2) {
-        Value2 = value2;
+        value2 = value2;
     }
 
-    @JsonProperty("Value3")
     public String getValue3() {
-        return Value3;
+        return value3;
     }
 
     public void setValue3(String value3) {
-        Value3 = value3;
+        value3 = value3;
     }
 }

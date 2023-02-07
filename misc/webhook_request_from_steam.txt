@@ -1,0 +1,6 @@
+POST /civ6/,
+client=91.196.248.242,
+
+headers=[host:"blztelbot.herokuapp.com", connection:"close", x-request-id:"5df20995-314d-48cd-a4c9-4d18a12dc2db", x-forwarded-proto:"http", x-forwarded-port:"80", via:"1.1 vegur", connect-time:"0", x-request-start:"1675803021023", total-route-time:"0", content-length:"62", Content-Type:"application/json;charset=UTF-8"]'
+
+payload={"value1":"Игра Samyang","value2":"CRiShToF","value3":"1"}
