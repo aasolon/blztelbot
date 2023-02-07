@@ -22,7 +22,7 @@ public class Civ6Webhook {
     }
 
     public void setValue1(String value1) {
-        value1 = value1;
+        this.value1 = value1;
     }
 
     public String getValue2() {
@@ -30,7 +30,7 @@ public class Civ6Webhook {
     }
 
     public void setValue2(String value2) {
-        value2 = value2;
+        this.value2 = value2;
     }
 
     public String getValue3() {
@@ -38,6 +38,6 @@ public class Civ6Webhook {
     }
 
     public void setValue3(String value3) {
-        value3 = value3;
+        this.value3 = value3;
     }
 }
