@@ -1,5 +1,10 @@
 package com.rtm.blztelbot.telegrambot;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -8,6 +13,11 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Component
 public class BlzTelBot extends TelegramLongPollingBot {
+
+    private static final Logger log = LoggerFactory.getLogger(BlzTelBot.class);
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
 //    @Autowired
 //    private BlzTelBotService blzTelBotService;
@@ -31,6 +41,13 @@ public class BlzTelBot extends TelegramLongPollingBot {
         // 5053544603 - t
         // 128316795  - a
         // 2147483647 - max
+
+        try {
+            log.debug("Telegram bot received update = " + objectMapper.writeValueAsString(update));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
         if (update.hasMessage()) {
             long telegramAdminChatId = Long.parseLong(System.getenv("TELEGRAM_ADMIN_CHAT_ID"));
             Long chatId = update.getMessage().getChatId();
@@ -43,7 +60,7 @@ public class BlzTelBot extends TelegramLongPollingBot {
         if (update.hasMessage() && update.getMessage().hasText()) {
             SendMessage message = new SendMessage();
             message.setChatId(update.getMessage().getChatId());
-            message.setText("recieved " + update.getMessage().getText());
+            message.setText("recieved " + update.getMessage().getText() + " from @" + update.getMessage().getFrom().getUserName());
             try {
                 execute(message); // Call method to send the message
             } catch (TelegramApiException e) {

@@ -1,0 +1,23 @@
+{
+  "update_id": 640871539,
+  "message": {
+    "message_id": 256310,
+    "from": {
+      "id": 128316795,
+      "first_name": "Artem",
+      "is_bot": false,
+      "last_name": "Solonschikov",
+      "username": "Rtm_Zz",
+      "language_code": "ru"
+    },
+    "date": 1675797810,
+    "chat": {
+      "id": 128316795,
+      "type": "private",
+      "first_name": "Artem",
+      "last_name": "Solonschikov",
+      "username": "Rtm_Zz"
+    },
+    "text": "55"
+  }
+}
