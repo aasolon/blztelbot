@@ -8,3 +8,6 @@ If ur provider blocks Telegram:
 1) uncomment bean DefaultBotOptions in BlztelbotApplication 
 2) uncomment BlzTelBot constructor
 3) launch Tor Bundle before app
+
+Admin can send a message on behalf of the bot to some chat:
+/sendmsg chatid=<chat_id> msg=<some message>
