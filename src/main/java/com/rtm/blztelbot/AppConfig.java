@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Configuration
 public class AppConfig {
 
@@ -30,7 +32,15 @@ public class AppConfig {
 
     @Bean
     public CommonsRequestLoggingFilter logFilter() {
-        CommonsRequestLoggingFilter filter = new CommonsRequestLoggingFilter();
+        CommonsRequestLoggingFilter filter = new CommonsRequestLoggingFilter() {
+            @Override
+            protected boolean shouldLog(HttpServletRequest request) {
+                if ("/wakeup".equals(request.getRequestURI())) {
+                    return false;
+                }
+                return super.shouldLog(request);
+            }
+        };
         filter.setIncludeQueryString(true);
         filter.setIncludePayload(true);
         filter.setMaxPayloadLength(10000);

@@ -1,35 +1,28 @@
-GET http://localhost:9876/send-message?chatId=-601860434&msg=@Rtm_Zz hi2
+GET http://blztelbot.herokuapp.com/send-message?chatId=-601860434&msg=111
+
+###
+POST http://localhost:9876/civ6
 
 ###
 POST http://localhost:9876/civ6
 Content-Type: application/json
 
 {
-  "Value1": "Game Name",
-  "Value2": "Player Name",
-  "Value3": "Turn Number",
+  "value1": "Game Name",
+  "value2": "civ_player_1",
+  "value3": "Turn Number",
   "unknown_prop": 123
 }
 
 ###
-POST http://91.196.248.242:9876/civ6
-Content-Type: application/json
-
-{
-  "Value1": "Game Name",
-  "Value2": "Player Name",
-  "Value3": "Turn Number"
-}
+POST https://blztelbot.herokuapp.com/civ6
 
 ###
-POST http://91.196.248.242:9876/civ6
+POST https://blztelbot.herokuapp.com/civ6
 Content-Type: application/json
 
 {
   "value1": "Game Name",
-  "value2": "Player Name",
+  "value2": "ASD",
   "value3": "Turn Number"
 }
-
-###
-POST http://91.196.248.242:9876/civ6

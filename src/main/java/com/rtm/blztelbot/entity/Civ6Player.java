@@ -24,6 +24,12 @@ public class Civ6Player {
     @Column(name = "TELEGRAM_ID", nullable = false)
     private Long telegramId;
 
+    @Column(name = "TURN_ORDER")
+    private Long turnOrder;
+
+    @Column(name = "ACTIVE", nullable = false)
+    private Boolean active = false;
+
     public UUID getId() {
         return id;
     }
@@ -62,5 +68,21 @@ public class Civ6Player {
 
     public void setTelegramId(Long telegramId) {
         this.telegramId = telegramId;
+    }
+
+    public Long getTurnOrder() {
+        return turnOrder;
+    }
+
+    public void setTurnOrder(Long turnOrder) {
+        this.turnOrder = turnOrder;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 }
