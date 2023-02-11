@@ -5,7 +5,6 @@ import com.rtm.blztelbot.entity.Civ6TurnInfo;
 import com.rtm.blztelbot.model.Civ6Webhook;
 import com.rtm.blztelbot.repository.Civ6PlayerRepository;
 import com.rtm.blztelbot.repository.Civ6TurnInfoRepository;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,7 +27,7 @@ public class Civ6Service {
         String turnNumber = webhook.getValue3();
 
         Civ6Player civ6Player = civ6PlayerRepository.findByCivName(webhookPlayerName);
-        String playerName = StringUtils.defaultString(civ6Player.getTelegramName(), webhookPlayerName);
+        String playerName = civ6Player != null ? civ6Player.getTelegramName() : webhookPlayerName;
 
         String message = String.format("Эй, @%s, ходи давай! (игра: %s, ход: %s)", playerName, gameName, turnNumber);
 //        blzTelBotService.sendMessageToChatId(-601860434, message);
