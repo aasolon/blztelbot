@@ -30,7 +30,8 @@ public class Civ6Service {
         String playerName = civ6Player != null ? civ6Player.getTelegramName() : webhookPlayerName;
 
         String message = String.format("Эй, @%s, ходи давай! (игра: %s, ход: %s)", playerName, gameName, turnNumber);
-//        blzTelBotService.sendMessageToChatId(-601860434, message);
+        if (civ6Player != null) //TODO delete if
+            blzTelBotService.sendMessageToChatId(-601860434, message);
 
         Civ6TurnInfo civ6TurnInfo = new Civ6TurnInfo();
         civ6TurnInfoRepository.save(civ6TurnInfo);
