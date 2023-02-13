@@ -6,8 +6,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+
+import java.time.Duration;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class BlzTelBotService {
@@ -16,26 +21,24 @@ public class BlzTelBotService {
     @Autowired
     private BlzTelBot blzTelBot;
 
-    public void processMsg(Message message) {
+    @Lazy
+    @Autowired
+    private Civ6Service civ6Service;
 
+    public void processAnyUpdate(Update update) {
+        String text = update.getMessage().getText();
+        if (text.startsWith("/slowpoke ")) {
+            processSlowpoke(text);
+        }
     }
 
-    public void processAdminMsg(Update update) {
+    public void processAdminUpdate(Update update) {
         String text = update.getMessage().getText();
-        if (text.startsWith("/sendmsg")) {
-            text = text.replace("/sendmsg ", "");
-            if (text.startsWith("chatid=")) {
-                text = text.replace("chatid=", "");
-                String chatId = StringUtils.substringBefore(text, " ");
-                text = text.replace(chatId + " ", "");
-                if (text.startsWith("msg=")) {
-                    text = text.replace("msg=", "");
-                    String msg = StringUtils.substringBefore(text, null);
-                    if (StringUtils.isNotEmpty(msg)) {
-                        blzTelBot.sendMessage(Long.parseLong(chatId), msg);
-                    }
-                }
-            }
+        if (text.startsWith("/sendmsg ")) {
+            processSendMsg(text);
+        }
+        if (text.startsWith("/slowpoke ")) {
+            processSlowpoke(text);
         }
     }
 
@@ -54,5 +57,57 @@ public class BlzTelBotService {
                 blzTelBot.sendMessage(chatId, token);
             }
         }
+    }
+
+    private void processSendMsg(String text) {
+        text = text.replace("/sendmsg ", "");
+        if (text.startsWith("chatid=")) {
+            text = text.replace("chatid=", "");
+            String chatId = StringUtils.substringBefore(text, " ");
+            text = text.replace(chatId + " ", "");
+            if (text.startsWith("msg=")) {
+                text = text.replace("msg=", "");
+                String msg = StringUtils.substringBefore(text, null);
+                if (StringUtils.isNotEmpty(msg)) {
+                    sendMessageToChatId(Long.parseLong(chatId), msg);
+                }
+            }
+        }
+    }
+
+    private void processSlowpoke(String text) {
+        text = text.replace("/slowpoke ", "");
+        long hours;
+        try {
+            hours = Long.parseLong(text);
+        } catch (NumberFormatException ex) {
+            return;
+        }
+        Map<String, Duration> playerDurations = civ6Service.calcPlayerDurations(hours);
+
+        // сортируем в порядке убывания затраченного на ход времени
+        Map<String,Duration> sortedPlayerDurations = playerDurations.entrySet().stream()
+                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+
+        String msg;
+        if (!sortedPlayerDurations.isEmpty()) {
+            StringBuilder msgBuilder = new StringBuilder("Предположительное потраченное игроками время на ходы за последние " + hours + " hours:");
+            for (Map.Entry<String, Duration> playerDurationEntry : sortedPlayerDurations.entrySet()) {
+                Duration duration = playerDurationEntry.getValue();
+                msgBuilder
+                        .append("\n")
+                        .append(playerDurationEntry.getKey())
+                        .append(": ")
+                        .append(String.format("%d days %d hours %02d minutes", duration.toDays(), duration.toHoursPart(), duration.toMinutesPart()));
+                if (duration.toDays() >= 1) {
+                    msgBuilder.append(" (\uD83D\uDE31)");
+                }
+            }
+            msg = msgBuilder.toString();
+        } else {
+            msg = "Данные за последние " + hours + " hours не найдены \uD83E\uDD37\u200D♂️";
+        }
+        sendMessageToMe(msg);
     }
 }

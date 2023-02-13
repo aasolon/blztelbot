@@ -53,9 +53,9 @@ public class BlzTelBot extends TelegramLongPollingBot {
             logUpdate(update);
             Long chatId = update.getMessage().getChatId();
             if (chatId != null && chatId == adminChatId) {
-                blzTelBotService.processAdminMsg(update);
+                blzTelBotService.processAdminUpdate(update);
             } else {
-//                blzTelBotService.processMsg(update.getMessage());
+                blzTelBotService.processAnyUpdate(update);
             }
 
 //            sendEchoMessage(update);

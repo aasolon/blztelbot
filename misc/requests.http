@@ -10,7 +10,7 @@ Content-Type: application/json
 {
   "value1": "Game Name",
   "value2": "civ_player_1",
-  "value3": "Turn Number",
+  "value3": "111",
   "unknown_prop": 123
 }
 
