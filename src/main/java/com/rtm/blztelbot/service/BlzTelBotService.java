@@ -28,7 +28,7 @@ public class BlzTelBotService {
     public void processAnyUpdate(Update update) {
         String text = update.getMessage().getText();
         if (text.startsWith("/slowpoke ")) {
-            processSlowpoke(text);
+            processSlowpoke(update.getMessage().getChatId(), text);
         }
     }
 
@@ -38,7 +38,7 @@ public class BlzTelBotService {
             processSendMsg(text);
         }
         if (text.startsWith("/slowpoke ")) {
-            processSlowpoke(text);
+            processSlowpoke(update.getMessage().getChatId(), text);
         }
     }
 
@@ -75,7 +75,7 @@ public class BlzTelBotService {
         }
     }
 
-    private void processSlowpoke(String text) {
+    private void processSlowpoke(Long chatId, String text) {
         text = text.replace("/slowpoke ", "");
         long hours;
         try {
@@ -108,6 +108,6 @@ public class BlzTelBotService {
         } else {
             msg = "Данные за последние " + hours + " hours не найдены \uD83E\uDD37\u200D♂️";
         }
-        sendMessageToMe(msg);
+        sendMessageToChatId(chatId, msg);
     }
 }
