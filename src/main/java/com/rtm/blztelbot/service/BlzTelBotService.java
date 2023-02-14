@@ -106,7 +106,7 @@ public class BlzTelBotService {
                         .append("\n")
                         .append(playerDurationEntry.getKey())
                         .append(": ")
-                        .append(String.format("%d days %d hours %02d minutes", duration.toDays(), duration.toHoursPart(), duration.toMinutesPart()));
+                        .append(String.format("%d days %02d hours %02d minutes", duration.toDays(), duration.toHoursPart(), duration.toMinutesPart()));
                 if (duration.toDays() >= 1) {
                     msgBuilder.append(" (\uD83D\uDE31)");
                 }

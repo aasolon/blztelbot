@@ -1,10 +1,12 @@
 package com.rtm.blztelbot.service.civ6;
 
 import com.rtm.blztelbot.entity.Civ6CurrentGame;
+import com.rtm.blztelbot.entity.Civ6Lifehack;
 import com.rtm.blztelbot.entity.Civ6Player;
 import com.rtm.blztelbot.entity.Civ6TurnInfo;
 import com.rtm.blztelbot.model.Civ6Webhook;
 import com.rtm.blztelbot.repository.Civ6CurrentGameRepository;
+import com.rtm.blztelbot.repository.Civ6LifehackRepository;
 import com.rtm.blztelbot.repository.Civ6PlayerRepository;
 import com.rtm.blztelbot.repository.Civ6TurnInfoRepository;
 import com.rtm.blztelbot.service.BlzTelBotService;
@@ -20,7 +22,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.rtm.blztelbot.telegrambot.BlzTelBot.TEST_CIV6_CHAT_ID;
+import static com.rtm.blztelbot.telegrambot.BlzTelBot.CIV6_GROUP_CHAT_ID;
 
 @Service
 public class Civ6Service {
@@ -29,13 +31,16 @@ public class Civ6Service {
     private final Civ6PlayerRepository civ6PlayerRepository;
     private final Civ6TurnInfoRepository civ6TurnInfoRepository;
     private final Civ6CurrentGameRepository civ6CurrentGameRepository;
+    private final Civ6LifehackRepository civ6LifehackRepository;
 
     public Civ6Service(BlzTelBotService blzTelBotService, Civ6PlayerRepository civ6PlayerRepository,
-                       Civ6TurnInfoRepository civ6TurnInfoRepository, Civ6CurrentGameRepository civ6CurrentGameRepository) {
+                       Civ6TurnInfoRepository civ6TurnInfoRepository, Civ6CurrentGameRepository civ6CurrentGameRepository,
+                       Civ6LifehackRepository civ6LifehackRepository) {
         this.blzTelBotService = blzTelBotService;
         this.civ6PlayerRepository = civ6PlayerRepository;
         this.civ6TurnInfoRepository = civ6TurnInfoRepository;
         this.civ6CurrentGameRepository = civ6CurrentGameRepository;
+        this.civ6LifehackRepository = civ6LifehackRepository;
     }
 
     public void processCiv6Webhook(Civ6Webhook webhook) {
@@ -50,7 +55,7 @@ public class Civ6Service {
 
         boolean isTestRequest = civ6Player != null && civ6Player.getCivName().startsWith("civ_player_");
         if (!isTestRequest)
-            blzTelBotService.sendMessageToChatId(TEST_CIV6_CHAT_ID, message);
+            blzTelBotService.sendMessageToChatId(CIV6_GROUP_CHAT_ID, message);
 
         Civ6CurrentGame currentGame = civ6CurrentGameRepository.findFirstByGameName(webhookGameName);
         if (StringUtils.equals(webhookGameName, currentGame.getGameName())) {
@@ -118,6 +123,17 @@ public class Civ6Service {
         playerDurationsResult.setPlayerDurations(playerDurations);
         playerDurationsResult.setTurnsCount(turnInfoList.size());
         return playerDurationsResult;
+    }
+
+    public String getRandomLifehackForPosting() {
+        Civ6Lifehack lifehack = civ6LifehackRepository.findFirstByPostedFalse();
+        if (lifehack != null) {
+            lifehack.setPosted(true);
+            civ6LifehackRepository.save(lifehack);
+            return lifehack.getLifehack();
+        } else {
+            return null;
+        }
     }
 
     private Duration calcConnectedTurnInfoDuration(Map<String, Civ6Player> playersMap, Civ6TurnInfo currentTurnInfo, Civ6TurnInfo nextTurnInfo) {
