@@ -1,6 +1,8 @@
 package com.rtm.blztelbot.service;
 
 import com.google.common.base.Splitter;
+import com.rtm.blztelbot.service.civ6.Civ6Service;
+import com.rtm.blztelbot.service.civ6.PlayerDurationsResult;
 import com.rtm.blztelbot.telegrambot.BlzTelBot;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,8 +87,9 @@ public class BlzTelBotService {
         } catch (NumberFormatException ex) {
             return;
         }
-        Map<String, Duration> playerDurations = civ6Service.calcPlayerDurations(hours);
 
+        PlayerDurationsResult playerDurationsResult = civ6Service.calcPlayerDurations(hours);
+        Map<String, Duration> playerDurations = playerDurationsResult.getPlayerDurations();
         // сортируем в порядке убывания затраченного на ход времени
         Map<String,Duration> sortedPlayerDurations = playerDurations.entrySet().stream()
                 .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
@@ -95,7 +98,7 @@ public class BlzTelBotService {
         String msg;
         if (!sortedPlayerDurations.isEmpty()) {
             StringBuilder msgBuilder = new StringBuilder("Статичтика за последние " + hours + " hours\n" +
-                    "Сделано ходов: " + sortedPlayerDurations.size() + "\n" +
+                    "Сделано ходов: " + playerDurationsResult.getTurnsCount() + "\n" +
                     "Предположительное потраченное игроками время на ходы:");
             for (Map.Entry<String, Duration> playerDurationEntry : sortedPlayerDurations.entrySet()) {
                 Duration duration = playerDurationEntry.getValue();

@@ -2,8 +2,8 @@ package com.rtm.blztelbot.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rtm.blztelbot.model.Civ6Webhook;
-import com.rtm.blztelbot.service.Civ6Service;
 import com.rtm.blztelbot.service.FlatService;
+import com.rtm.blztelbot.service.civ6.Civ6Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;

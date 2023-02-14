@@ -1,4 +1,4 @@
-package com.rtm.blztelbot.service;
+package com.rtm.blztelbot.service.civ6;
 
 import com.rtm.blztelbot.entity.Civ6CurrentGame;
 import com.rtm.blztelbot.entity.Civ6Player;
@@ -7,6 +7,7 @@ import com.rtm.blztelbot.model.Civ6Webhook;
 import com.rtm.blztelbot.repository.Civ6CurrentGameRepository;
 import com.rtm.blztelbot.repository.Civ6PlayerRepository;
 import com.rtm.blztelbot.repository.Civ6TurnInfoRepository;
+import com.rtm.blztelbot.service.BlzTelBotService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -61,8 +62,9 @@ public class Civ6Service {
         }
     }
 
-    public Map<String, Duration> calcPlayerDurations(long hours) {
-        HashMap<String, Duration> result = new HashMap<>();
+    public PlayerDurationsResult calcPlayerDurations(long hours) {
+        PlayerDurationsResult playerDurationsResult = new PlayerDurationsResult();
+        HashMap<String, Duration> playerDurations = new HashMap<>();
 
         List<Civ6Player> activePlayers = civ6PlayerRepository.findAllByActiveTrue();
         Map<String, Civ6Player> playersMap = activePlayers.stream().collect(Collectors.toMap(Civ6Player::getCivName, Function.identity()));
@@ -79,6 +81,7 @@ public class Civ6Service {
             // считаем время между "первый ход, который предшествовал выбранному списку" и "первый ход из списка"
             if (!turnInfoList.isEmpty()) {
                 Civ6TurnInfo firstTurnInfo = turnInfoList.get(0);
+                // если два проверяемых хода не соседние, то выставляем Duration.ZERO
                 if (checkTurnsConnected(zeroTurnInfo, firstTurnInfo, playersMap)) {
                     zeroPlayerDuration = Duration.between(nowMinusHours, firstTurnInfo.getCreateDatetime());
                 } else {
@@ -89,7 +92,7 @@ public class Civ6Service {
             else {
                 zeroPlayerDuration = Duration.between(nowMinusHours, now);
             }
-            result.put(zeroTurnInfo.getPlayerName(), zeroPlayerDuration);
+            playerDurations.put(zeroTurnInfo.getPlayerName(), zeroPlayerDuration);
         }
 
 
@@ -106,10 +109,15 @@ public class Civ6Service {
             else {
                 currentPlayerDuration = Duration.between(currentTurnInfo.getCreateDatetime(), now);
             }
-            result.compute(currentTurnInfo.getPlayerName(),
-                    (k, v) -> v == null ? currentPlayerDuration : v.plus(currentPlayerDuration));
+            playerDurations.compute(currentTurnInfo.getPlayerName(),
+                    (k, v) -> v == Duration.ZERO ? v :
+                            v == null ? currentPlayerDuration : v.plus(currentPlayerDuration)
+            );
         }
-        return result;
+
+        playerDurationsResult.setPlayerDurations(playerDurations);
+        playerDurationsResult.setTurnsCount(turnInfoList.size());
+        return playerDurationsResult;
     }
 
     private Duration calcConnectedTurnInfoDuration(Map<String, Civ6Player> playersMap, Civ6TurnInfo currentTurnInfo, Civ6TurnInfo nextTurnInfo) {
