@@ -97,7 +97,7 @@ public class BlzTelBotService {
 
         String msg;
         if (!sortedPlayerDurations.isEmpty()) {
-            StringBuilder msgBuilder = new StringBuilder("Статичтика за последние " + hours + " hours\n" +
+            StringBuilder msgBuilder = new StringBuilder("Статистика за последние " + hours + " hours\n" +
                     "Сделано ходов: " + playerDurationsResult.getTurnsCount() + "\n" +
                     "Предположительное потраченное игроками время на ходы:");
             for (Map.Entry<String, Duration> playerDurationEntry : sortedPlayerDurations.entrySet()) {
