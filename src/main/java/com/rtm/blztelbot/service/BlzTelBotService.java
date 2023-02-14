@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 @Service
 public class BlzTelBotService {
 
+    private static final String STATS_COMMAND = "/stats";
+
     @Lazy
     @Autowired
     private BlzTelBot blzTelBot;
@@ -27,8 +29,8 @@ public class BlzTelBotService {
 
     public void processAnyUpdate(Update update) {
         String text = update.getMessage().getText();
-        if (text.startsWith("/slowpoke ")) {
-            processSlowpoke(update.getMessage().getChatId(), text);
+        if (text.startsWith(STATS_COMMAND + " ")) {
+            processStatsCommand(update.getMessage().getChatId(), text);
         }
     }
 
@@ -37,8 +39,8 @@ public class BlzTelBotService {
         if (text.startsWith("/sendmsg ")) {
             processSendMsg(text);
         }
-        if (text.startsWith("/slowpoke ")) {
-            processSlowpoke(update.getMessage().getChatId(), text);
+        if (text.startsWith(STATS_COMMAND + " ")) {
+            processStatsCommand(update.getMessage().getChatId(), text);
         }
     }
 
@@ -75,8 +77,8 @@ public class BlzTelBotService {
         }
     }
 
-    private void processSlowpoke(Long chatId, String text) {
-        text = text.replace("/slowpoke ", "");
+    public void processStatsCommand(Long chatId, String text) {
+        text = text.replace(STATS_COMMAND + " ", "");
         long hours;
         try {
             hours = Long.parseLong(text);
@@ -92,7 +94,9 @@ public class BlzTelBotService {
 
         String msg;
         if (!sortedPlayerDurations.isEmpty()) {
-            StringBuilder msgBuilder = new StringBuilder("Предположительное потраченное игроками время на ходы за последние " + hours + " hours:");
+            StringBuilder msgBuilder = new StringBuilder("Статичтика за последние " + hours + " hours\n" +
+                    "Сделано ходов: " + sortedPlayerDurations.size() + "\n" +
+                    "Предположительное потраченное игроками время на ходы:");
             for (Map.Entry<String, Duration> playerDurationEntry : sortedPlayerDurations.entrySet()) {
                 Duration duration = playerDurationEntry.getValue();
                 msgBuilder

@@ -21,6 +21,8 @@ public class BlzTelBot extends TelegramLongPollingBot {
 
     private static final Logger log = LoggerFactory.getLogger(BlzTelBot.class);
 
+    public static final long TEST_CIV6_CHAT_ID = -601860434;
+
     @Value("${TELEGRAM_ADMIN_CHAT_ID}")
     private long adminChatId;
 

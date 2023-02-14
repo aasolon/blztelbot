@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.rtm.blztelbot.telegrambot.BlzTelBot.TEST_CIV6_CHAT_ID;
+
 @Service
 public class Civ6Service {
 
@@ -47,7 +49,7 @@ public class Civ6Service {
 
         boolean isTestRequest = civ6Player != null && civ6Player.getCivName().startsWith("civ_player_");
         if (!isTestRequest)
-            blzTelBotService.sendMessageToChatId(-601860434, message);
+            blzTelBotService.sendMessageToChatId(TEST_CIV6_CHAT_ID, message);
 
         Civ6CurrentGame currentGame = civ6CurrentGameRepository.findFirstByGameName(webhookGameName);
         if (StringUtils.equals(webhookGameName, currentGame.getGameName())) {
