@@ -108,7 +108,16 @@ public class Civ6Service {
             // считаем время между "текущий ход" и "следующий ход"
             if (i + 1 < turnInfoList.size()) {
                 Civ6TurnInfo nextTurnInfo = turnInfoList.get(i + 1);
-                currentPlayerDuration = calcConnectedTurnInfoDuration(playersMap, currentTurnInfo, nextTurnInfo);
+                // если два проверяемых хода эту дубли, то выставляем берем следующий ход из списка
+                if (checkSameTurns(currentTurnInfo, nextTurnInfo, playersMap)) {
+                    continue;
+                }
+                // если два проверяемых хода не соседние, то выставляем Duration.ZERO
+                else if (checkTurnsConnected(currentTurnInfo, nextTurnInfo, playersMap)) {
+                    currentPlayerDuration = Duration.between(currentTurnInfo.getCreateDatetime(), nextTurnInfo.getCreateDatetime());
+                } else {
+                    currentPlayerDuration = Duration.ZERO;
+                }
             }
             // для последнего хода из списка считаем время между "последний ход" и "now"
             else {
@@ -136,14 +145,14 @@ public class Civ6Service {
         }
     }
 
-    private Duration calcConnectedTurnInfoDuration(Map<String, Civ6Player> playersMap, Civ6TurnInfo currentTurnInfo, Civ6TurnInfo nextTurnInfo) {
-        Duration currentPlayerDuration;
-        if (checkTurnsConnected(currentTurnInfo, nextTurnInfo, playersMap)) {
-            currentPlayerDuration = Duration.between(currentTurnInfo.getCreateDatetime(), nextTurnInfo.getCreateDatetime());
-        } else {
-            currentPlayerDuration = Duration.ZERO;
+    private boolean checkSameTurns(Civ6TurnInfo currentTurnInfo, Civ6TurnInfo nextTurnInfo, Map<String, Civ6Player> playersMap) {
+        Civ6Player currentPlayer = playersMap.get(currentTurnInfo.getPlayerName());
+        Civ6Player nextPlayer = playersMap.get(nextTurnInfo.getPlayerName());
+        if (currentTurnInfo.getTurnNumber().longValue() == nextTurnInfo.getTurnNumber() &&
+                nextPlayer.getId().equals(currentPlayer.getId())) {
+            return true;
         }
-        return currentPlayerDuration;
+        return false;
     }
 
     private boolean checkTurnsConnected(Civ6TurnInfo currentTurnInfo, Civ6TurnInfo nextTurnInfo, Map<String, Civ6Player> playersMap) {

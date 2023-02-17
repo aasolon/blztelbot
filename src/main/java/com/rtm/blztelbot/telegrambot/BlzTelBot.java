@@ -15,13 +15,14 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
  * 128316795  - a
  * 5053544603 - t
  * -601860434 - test civ6 chat
+ * -1001189608207 - civ6 chat
  */
 @Component
 public class BlzTelBot extends TelegramLongPollingBot {
 
     private static final Logger log = LoggerFactory.getLogger(BlzTelBot.class);
 
-    public static final long CIV6_GROUP_CHAT_ID = -601860434;
+    public static final long CIV6_GROUP_CHAT_ID = -1001189608207L;
 
     @Value("${TELEGRAM_ADMIN_CHAT_ID}")
     private long adminChatId;
