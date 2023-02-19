@@ -124,7 +124,7 @@ public class Civ6Service {
                 currentPlayerDuration = Duration.between(currentTurnInfo.getCreateDatetime(), now);
             }
             playerDurations.compute(currentTurnInfo.getPlayerName(),
-                    (k, v) -> v == Duration.ZERO ? v :
+                    (k, v) -> v == Duration.ZERO || currentPlayerDuration == Duration.ZERO ? Duration.ZERO :
                             v == null ? currentPlayerDuration : v.plus(currentPlayerDuration)
             );
         }
