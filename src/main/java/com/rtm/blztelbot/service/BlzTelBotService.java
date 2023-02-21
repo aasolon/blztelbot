@@ -98,13 +98,13 @@ public class BlzTelBotService {
         String msg;
         if (!sortedPlayerDurations.isEmpty()) {
             StringBuilder msgBuilder = new StringBuilder("Статистика за последние " + hours + " hours\n" +
-                    "Сделано ходов: " + playerDurationsResult.getTurnsCount() + "\n" +
+                    "Сделано ходов:  " + playerDurationsResult.getTurnsCount() + "\n" +
                     "Предположительное потраченное игроками время на ходы:");
             for (Map.Entry<String, Duration> playerDurationEntry : sortedPlayerDurations.entrySet()) {
                 Duration duration = playerDurationEntry.getValue();
                 msgBuilder
                         .append("\n")
-                        .append(playerDurationEntry.getKey())
+                        .append(String.format("*%10s*",playerDurationEntry.getKey()))
                         .append(": ")
                         .append(String.format("%d days %02d hours %02d minutes", duration.toDays(), duration.toHoursPart(), duration.toMinutesPart()));
                 if (duration.toDays() >= 1) {
