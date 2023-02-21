@@ -100,6 +100,7 @@ public class BlzTelBotService {
             StringBuilder msgBuilder = new StringBuilder("Статистика за последние " + hours + " hours\n" +
                     "Сделано ходов:  " + playerDurationsResult.getTurnsCount() + "\n" +
                     "Предположительное потраченное игроками время на ходы:");
+            msgBuilder.append("\n");
             msgBuilder.append("```");
             for (Map.Entry<String, Duration> playerDurationEntry : sortedPlayerDurations.entrySet()) {
                 Duration duration = playerDurationEntry.getValue();
@@ -112,6 +113,7 @@ public class BlzTelBotService {
                     msgBuilder.append(" (\uD83D\uDE31)");
                 }
             }
+            msgBuilder.append("\n");
             msgBuilder.append("```");
             msg = msgBuilder.toString();
         } else {
