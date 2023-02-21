@@ -69,6 +69,7 @@ public class BlzTelBot extends TelegramLongPollingBot {
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
         message.setText(text);
+        message.setParseMode("Markdown");
         try {
             execute(message); // Call method to send the message
         } catch (TelegramApiException e) {
