@@ -56,9 +56,17 @@ public class BlzTelBotService {
     }
 
     public void sendMessageToChatId(long chatId, String text) {
-        for(final String token : Splitter.fixedLength(4000).split(text)) {
+        for (String token : Splitter.fixedLength(4000).split(text)) {
             if (StringUtils.isNotEmpty(token)) {
                 blzTelBot.sendMessage(chatId, token);
+            }
+        }
+    }
+
+    public void sendMessageToChatIdWithMarkdown(long chatId, String text) {
+        for (String token : Splitter.fixedLength(4000).split(text)) {
+            if (StringUtils.isNotEmpty(token)) {
+                blzTelBot.sendMessageWithMarkdown(chatId, token);
             }
         }
     }
@@ -119,6 +127,6 @@ public class BlzTelBotService {
         } else {
             msg = "Данные за последние " + hours + " hours не найдены \uD83E\uDD37\u200D♂️";
         }
-        sendMessageToChatId(chatId, msg);
+        sendMessageToChatIdWithMarkdown(chatId, msg);
     }
 }
