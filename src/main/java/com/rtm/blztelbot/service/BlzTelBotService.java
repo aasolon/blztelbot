@@ -100,17 +100,19 @@ public class BlzTelBotService {
             StringBuilder msgBuilder = new StringBuilder("Статистика за последние " + hours + " hours\n" +
                     "Сделано ходов:  " + playerDurationsResult.getTurnsCount() + "\n" +
                     "Предположительное потраченное игроками время на ходы:");
+            msgBuilder.append("```");
             for (Map.Entry<String, Duration> playerDurationEntry : sortedPlayerDurations.entrySet()) {
                 Duration duration = playerDurationEntry.getValue();
                 msgBuilder
                         .append("\n")
-                        .append(String.format("*%10s*",playerDurationEntry.getKey()))
+                        .append(String.format("%10s", playerDurationEntry.getKey()))
                         .append(": ")
                         .append(String.format("%d days %02d hours %02d minutes", duration.toDays(), duration.toHoursPart(), duration.toMinutesPart()));
                 if (duration.toDays() >= 1) {
                     msgBuilder.append(" (\uD83D\uDE31)");
                 }
             }
+            msgBuilder.append("```");
             msg = msgBuilder.toString();
         } else {
             msg = "Данные за последние " + hours + " hours не найдены \uD83E\uDD37\u200D♂️";
