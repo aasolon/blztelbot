@@ -158,7 +158,10 @@ public class Civ6Service {
     private boolean checkTurnsConnected(Civ6TurnInfo currentTurnInfo, Civ6TurnInfo nextTurnInfo, Map<String, Civ6Player> playersMap) {
         Civ6Player currentPlayer = playersMap.get(currentTurnInfo.getPlayerName());
         Civ6Player nextPlayer = playersMap.get(nextTurnInfo.getPlayerName());
-        if (currentTurnInfo.getTurnNumber() + 1 == nextTurnInfo.getTurnNumber() &&
+        if (
+                (currentTurnInfo.getTurnNumber().longValue() == nextTurnInfo.getTurnNumber() ||
+                        currentTurnInfo.getTurnNumber() + 1 == nextTurnInfo.getTurnNumber()
+                ) &&
                 currentPlayer.getTurnOrder() == playersMap.size() && nextPlayer.getTurnOrder() == 1) {
             return true;
         }
