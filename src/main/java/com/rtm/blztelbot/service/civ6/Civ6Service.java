@@ -72,7 +72,8 @@ public class Civ6Service {
         HashMap<String, Duration> playerDurations = new HashMap<>();
 
         List<Civ6Player> activePlayers = civ6PlayerRepository.findAllByActiveTrue();
-        Map<String, Civ6Player> playersMap = activePlayers.stream().collect(Collectors.toMap(Civ6Player::getCivName, Function.identity()));
+        Map<String, Civ6Player> playersMapByName = activePlayers.stream().collect(Collectors.toMap(Civ6Player::getCivName, Function.identity()));
+        Map<Long, Civ6Player> playersMapByTurnOrder = activePlayers.stream().collect(Collectors.toMap(Civ6Player::getTurnOrder, Function.identity()));
 
         Instant now = Instant.now();
         Instant nowMinusHours = now.minus(hours, ChronoUnit.HOURS);
@@ -87,7 +88,7 @@ public class Civ6Service {
             if (!turnInfoList.isEmpty()) {
                 Civ6TurnInfo firstTurnInfo = turnInfoList.get(0);
                 // если два проверяемых хода не соседние, то выставляем Duration.ZERO
-                if (checkTurnsConnected(zeroTurnInfo, firstTurnInfo, playersMap)) {
+                if (checkTurnsConnected(zeroTurnInfo, firstTurnInfo, playersMapByName)) {
                     zeroPlayerDuration = Duration.between(nowMinusHours, firstTurnInfo.getCreateDatetime());
                 } else {
                     zeroPlayerDuration = Duration.ZERO;
@@ -104,19 +105,27 @@ public class Civ6Service {
 
         for (int i = 0; i < turnInfoList.size(); i++) {
             Civ6TurnInfo currentTurnInfo = turnInfoList.get(i);
+            Civ6Player currentPlayer = playersMapByName.get(currentTurnInfo.getPlayerName());
             Duration currentPlayerDuration;
             // считаем время между "текущий ход" и "следующий ход"
             if (i + 1 < turnInfoList.size()) {
                 Civ6TurnInfo nextTurnInfo = turnInfoList.get(i + 1);
-                // если два проверяемых хода эту дубли, то выставляем берем следующий ход из списка
-                if (checkSameTurns(currentTurnInfo, nextTurnInfo, playersMap)) {
+                Civ6Player nextPlayer = playersMapByName.get(nextTurnInfo.getPlayerName());
+                // если два проверяемых хода эту дубли, то яразу переходим к следующему ходу из списка
+                if (checkSameTurns(currentTurnInfo, nextTurnInfo, playersMapByName)) {
                     continue;
                 }
-                // если два проверяемых хода не соседние, то выставляем Duration.ZERO
-                else if (checkTurnsConnected(currentTurnInfo, nextTurnInfo, playersMap)) {
+                // если два проверяемых хода не соседние, то выставляем Duration.ZERO текущему игроку и пропущенным игрокам
+                else if (checkTurnsConnected(currentTurnInfo, nextTurnInfo, playersMapByName)) {
                     currentPlayerDuration = Duration.between(currentTurnInfo.getCreateDatetime(), nextTurnInfo.getCreateDatetime());
                 } else {
                     currentPlayerDuration = Duration.ZERO;
+
+                    Civ6Player nextTurnOrderPlayer = getNextTurnOrderPlayer(playersMapByTurnOrder, currentPlayer.getTurnOrder());
+                    while (nextTurnOrderPlayer.getTurnOrder().longValue() != nextPlayer.getTurnOrder()) {
+                        playerDurations.put(nextTurnOrderPlayer.getCivName(), Duration.ZERO);
+                        nextTurnOrderPlayer = getNextTurnOrderPlayer(playersMapByTurnOrder, nextTurnOrderPlayer.getTurnOrder());
+                    }
                 }
             }
             // для последнего хода из списка считаем время между "последний ход" и "now"
@@ -170,5 +179,13 @@ public class Civ6Service {
             return true;
         }
         return false;
+    }
+
+    private Civ6Player getNextTurnOrderPlayer(Map<Long, Civ6Player> playersMap, Long currentPlayerTurnOrder) {
+        if (currentPlayerTurnOrder == playersMap.size()) {
+            return playersMap.get(1L);
+        }
+
+        return playersMap.get(currentPlayerTurnOrder + 1);
     }
 }
