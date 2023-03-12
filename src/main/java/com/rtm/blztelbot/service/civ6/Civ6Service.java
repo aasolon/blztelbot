@@ -53,6 +53,10 @@ public class Civ6Service {
 
         String message = String.format("Эй, @%s, ходи давай! (игра: %s, ход: %s)", playerName, webhookGameName, turnNumber);
 
+        if (civ6Player != null && StringUtils.isNotEmpty(civ6Player.getGameUrl())) {
+            message += "\nВойти в игру: " + civ6Player.getGameUrl();
+        }
+
         boolean isTestRequest = civ6Player != null && civ6Player.getCivName().startsWith("civ_player_");
         if (!isTestRequest)
             blzTelBotService.sendMessageToChatId(CIV6_GROUP_CHAT_ID, message);

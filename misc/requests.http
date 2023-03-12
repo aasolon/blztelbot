@@ -18,11 +18,11 @@ Content-Type: application/json
 POST https://blztelbot.herokuapp.com/civ6
 
 ###
-POST https://blztelbot.herokuapp.com/civ6
+POST http://localhost:9876/civ6
 Content-Type: application/json
 
 {
-  "value1": "Game Name",
-  "value2": "ASD",
-  "value3": "Turn Number"
+  "value1": "Anton_Dima_Artem_artem",
+  "value2": "Lazm",
+  "value3": "1"
 }

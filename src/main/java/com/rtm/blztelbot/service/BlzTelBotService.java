@@ -63,14 +63,6 @@ public class BlzTelBotService {
         }
     }
 
-    public void sendMessageToChatIdWithMarkdown(long chatId, String text) {
-        for (String token : Splitter.fixedLength(4000).split(text)) {
-            if (StringUtils.isNotEmpty(token)) {
-                blzTelBot.sendMessageWithMarkdown(chatId, token);
-            }
-        }
-    }
-
     private void processSendMsg(String text) {
         text = text.replace("/sendmsg ", "");
         if (text.startsWith("chatid=")) {
@@ -108,25 +100,23 @@ public class BlzTelBotService {
             StringBuilder msgBuilder = new StringBuilder("Статистика за последние " + hours + " hours\n" +
                     "Сделано ходов:  " + playerDurationsResult.getTurnsCount() + "\n" +
                     "Предположительное потраченное игроками время на ходы:");
-            msgBuilder.append("\n");
-            msgBuilder.append("```");
             for (Map.Entry<String, Duration> playerDurationEntry : sortedPlayerDurations.entrySet()) {
                 Duration duration = playerDurationEntry.getValue();
                 msgBuilder
                         .append("\n")
+                        .append("<code>")
                         .append(String.format("%10s", playerDurationEntry.getKey()))
                         .append(": ")
                         .append(String.format("%d days %02d hours %02d minutes", duration.toDays(), duration.toHoursPart(), duration.toMinutesPart()));
                 if (duration.toDays() >= 1) {
                     msgBuilder.append(" (\uD83D\uDE31)");
                 }
+                msgBuilder.append("</code>");
             }
-            msgBuilder.append("\n");
-            msgBuilder.append("```");
             msg = msgBuilder.toString();
         } else {
             msg = "Данные за последние " + hours + " hours не найдены \uD83E\uDD37\u200D♂️";
         }
-        sendMessageToChatIdWithMarkdown(chatId, msg);
+        sendMessageToChatId(chatId, msg);
     }
 }

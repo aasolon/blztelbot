@@ -30,6 +30,9 @@ public class Civ6Player {
     @Column(name = "ACTIVE", nullable = false)
     private Boolean active = false;
 
+    @Column(name = "GAME_URL", length = 4000)
+    private String gameUrl;
+
     public UUID getId() {
         return id;
     }
@@ -84,5 +87,13 @@ public class Civ6Player {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public String getGameUrl() {
+        return gameUrl;
+    }
+
+    public void setGameUrl(String gameUrl) {
+        this.gameUrl = gameUrl;
     }
 }
