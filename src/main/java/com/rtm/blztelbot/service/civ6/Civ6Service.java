@@ -51,10 +51,11 @@ public class Civ6Service {
         Civ6Player civ6Player = civ6PlayerRepository.findByCivName(webhookPlayerName);
         String playerName = civ6Player != null ? civ6Player.getTelegramName() : webhookPlayerName;
 
-        String message = String.format("Эй, @%s, ходи давай! (игра: %s, ход: %s)", playerName, webhookGameName, turnNumber);
+//        String message = String.format("Эй @%s ходи! (игра: %s, ход: %s)", playerName, webhookGameName, turnNumber);
+        String message = String.format("@%s | ход %s", playerName, turnNumber);
 
         if (civ6Player != null && StringUtils.isNotEmpty(civ6Player.getGameUrl())) {
-            message += "\nВойти в игру: " + civ6Player.getGameUrl();
+            message += " | " + civ6Player.getGameUrl();
         }
 
         boolean isTestRequest = civ6Player != null && civ6Player.getCivName().startsWith("civ_player_");
