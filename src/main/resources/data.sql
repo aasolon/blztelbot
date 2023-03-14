@@ -2,8 +2,8 @@ INSERT INTO civ_current_game (id, version, game_name) VALUES ('a728eaf3-055c-485
 
 INSERT INTO civ_player (id, version, civ_name, telegram_name, telegram_id, turn_order, active) VALUES ('16600514-4656-4f90-87b9-3dd6a4fcc19d', 1, 'Macmep[Intel 67]', 'Macm3p', 353120643, null, false);
 INSERT INTO civ_player (id, version, civ_name, telegram_name, telegram_id, turn_order, active) VALUES ('820fddd9-30f5-4f9f-92ec-dc04ef322585', 1, 'Samyang', 'Rtm_Zz', 128316795, 3, true);
-INSERT INTO civ_player (id, version, civ_name, telegram_name, telegram_id, turn_order, active) VALUES ('a728eaf3-055c-4854-8c55-f5f6fe5124ae', 1, 'CRiShToF', 'a_nton_p', 120643177, 1, true);
-INSERT INTO civ_player (id, version, civ_name, telegram_name, telegram_id, turn_order, active, game_url) VALUES ('ddf920ac-de84-4f7b-9796-487fa7809e89', 1, 'Lazm', 'bryntsev', 35842225, 2, true, 'https://web.holycam.net/uciv6');
+INSERT INTO civ_player (id, version, civ_name, telegram_name, telegram_id, turn_order, active, game_url) VALUES ('a728eaf3-055c-4854-8c55-f5f6fe5124ae', 1, 'CRiShToF', 'a_nton_p', 120643177, 1, true, 'tinyurl.com/smcvi');
+INSERT INTO civ_player (id, version, civ_name, telegram_name, telegram_id, turn_order, active, game_url) VALUES ('ddf920ac-de84-4f7b-9796-487fa7809e89', 1, 'Lazm', 'bryntsev', 35842225, 2, true, 'is.gd/xWEEtU');
 
 
 INSERT INTO civ_turn_info (id, version, game_name, turn_number, player_name, create_datetime) VALUES ('bbb89de0-ef6e-447f-9e6f-bbb0f454a9b4', 0, 'Anton_Dima_Artem_artem', 41, 'Lazm', '2023-02-13 14:53:50.246711');

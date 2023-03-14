@@ -48,20 +48,6 @@ public class Civ6Service {
         String webhookPlayerName = webhook.getValue2();
         String turnNumber = webhook.getValue3();
 
-        Civ6Player civ6Player = civ6PlayerRepository.findByCivName(webhookPlayerName);
-        String playerName = civ6Player != null ? civ6Player.getTelegramName() : webhookPlayerName;
-
-//        String message = String.format("Эй @%s ходи! (игра: %s, ход: %s)", playerName, webhookGameName, turnNumber);
-        String message = String.format("@%s | ход %s", playerName, turnNumber);
-
-        if (civ6Player != null && StringUtils.isNotEmpty(civ6Player.getGameUrl())) {
-            message += " | " + civ6Player.getGameUrl();
-        }
-
-        boolean isTestRequest = civ6Player != null && civ6Player.getCivName().startsWith("civ_player_");
-        if (!isTestRequest)
-            blzTelBotService.sendMessageToChatId(CIV6_GROUP_CHAT_ID, message);
-
         Civ6CurrentGame currentGame = civ6CurrentGameRepository.findFirstByGameName(webhookGameName);
         if (StringUtils.equals(webhookGameName, currentGame.getGameName())) {
             Civ6TurnInfo civ6TurnInfo = new Civ6TurnInfo();
@@ -69,6 +55,20 @@ public class Civ6Service {
             civ6TurnInfo.setTurnNumber(Long.parseLong(turnNumber));
             civ6TurnInfo.setPlayerName(webhookPlayerName);
             civ6TurnInfoRepository.save(civ6TurnInfo);
+        }
+
+        Civ6Player civ6Player = civ6PlayerRepository.findByCivName(webhookPlayerName);
+        boolean isTestRequest = civ6Player != null && civ6Player.getCivName().startsWith("civ_player_");
+        if (!isTestRequest) {
+            String playerName = civ6Player != null ? civ6Player.getTelegramName() : webhookPlayerName;
+            //        String message = String.format("Эй @%s ходи! (игра: %s, ход: %s)", playerName, webhookGameName, turnNumber);
+            String message = String.format("@%s | ход %s", playerName, turnNumber);
+
+            if (civ6Player != null && StringUtils.isNotEmpty(civ6Player.getGameUrl())) {
+                message += " | " + civ6Player.getGameUrl();
+            }
+
+            blzTelBotService.sendMessageToChatId(CIV6_GROUP_CHAT_ID, message);
         }
     }
 
