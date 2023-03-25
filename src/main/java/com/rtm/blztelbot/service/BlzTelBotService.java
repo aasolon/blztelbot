@@ -105,7 +105,7 @@ public class BlzTelBotService {
                 msgBuilder
                         .append("\n")
                         .append("<code>")
-                        .append(String.format("%10s", playerDurationEntry.getKey()))
+                        .append(String.format("%16s", playerDurationEntry.getKey()))
                         .append(": ")
                         .append(String.format("%d days %02d hours %02d minutes", duration.toDays(), duration.toHoursPart(), duration.toMinutesPart()));
                 if (duration.toDays() >= 1) {

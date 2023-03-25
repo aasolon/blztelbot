@@ -19,12 +19,12 @@ public class Civ6Scheduler {
         this.civ6Service = civ6Service;
     }
 
-    @Scheduled(cron = "0 0 20 * * *")
+    @Scheduled(cron = "0 0 21 * * *")
     public void printStatsEveryDay() {
         blzTelBotService.processStatsCommand(CIV6_GROUP_CHAT_ID, "/stats 24");
     }
 
-    @Scheduled(cron = "0 0 19 * * *")
+    @Scheduled(cron = "0 0 20 * * *")
     public void printLifeHackEveryDay() {
         String lifehack = civ6Service.getRandomLifehackForPosting();
         if (lifehack != null) {
